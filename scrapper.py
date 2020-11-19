@@ -1,6 +1,6 @@
 import os
 import datetime
-import tabula
+#import tabula
 from pathlib import Path
 import re
 

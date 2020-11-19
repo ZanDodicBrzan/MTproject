@@ -27,6 +27,11 @@ body {
     <h1><div class="info">Poglej po občinah!</div></h1>
     <h2>Trenutno hoverana:</h2>
     <h2><div class="obcina">Nič</div></h2>
+
+    <h2>Aktivni Primeri</h2><h2 id="active"></h2>
+    <h2>Potrjeni Primeri</h2><h2 id="confirmed"></h2>
+    <h2>Umrli</h2><h2 id="deaths"></h2>
+
     <!-- Tukaj tipo daš nek place holder kjer bo mapa -->
     <svg id="placeH" width="1000px" height="700px">
       <g class="map"></g>
@@ -59,7 +64,11 @@ body {
         arrayRegij.forEach(regija => {
             Object.entries(regija).forEach(([imeObcine, podatki]) => {
               if(imeObcine == obcina){
-                console.log(imeObcine, podatki);
+                console.log(podatki);
+                document.getElementById("active").innerHTML = podatki.activeCases;
+                document.getElementById("confirmed").innerHTML = podatki.confirmedToDate;
+                if(podatki.deceasedToDate==undefined) document.getElementById("deaths").innerHTML = "0";
+                else document.getElementById("deaths").innerHTML = podatki.deceasedToDate;
               }
             })
         })
@@ -83,7 +92,7 @@ var geoGenerator = d3.geoPath()
 function handleMouseover(d) {
   d3.select('#content .obcina')
     .text(d.properties.name);
-  console.log((d.properties.name).replace(/\s+/g, '_').toLowerCase());
+  //console.log((d.properties.name).replace(/\s+/g, '_').toLowerCase());
 
   let obcina = (d.properties.name).replace(/\s+/g, '_').toLowerCase();
   obcineFromTo(from, to, obcina);

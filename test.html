@@ -34,6 +34,40 @@ body {
     <!-- ta svg zgoraj -->
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js"></script>
+  
+  <script>  
+  async function getData(url) {
+  return fetch(url)
+  .then(res => {
+          if (!res.ok) {
+              throw new Error(res.error);
+          }
+          return res;
+   })
+  .then(res => res.json())
+  .catch(err => console.log(err));
+  }
+  
+  const from = "2020-10-10";
+  const to = "2020-10-10";
+
+  const obcineFromTo = async(from, to, obcina) => {
+    let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
+    Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
+        const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
+        
+        arrayRegij.forEach(regija => {
+            Object.entries(regija).forEach(([imeObcine, podatki]) => {
+              if(imeObcine == obcina){
+                console.log(imeObcine, podatki);
+              }
+            })
+        })
+    })
+};
+  //obcineFromTo(from, to);
+
+  </script>
 <script>
 
 var projection = d3.geoMercator()
@@ -49,6 +83,10 @@ var geoGenerator = d3.geoPath()
 function handleMouseover(d) {
   d3.select('#content .obcina')
     .text(d.properties.name);
+  console.log((d.properties.name).replace(/\s+/g, '_').toLowerCase());
+
+  let obcina = (d.properties.name).replace(/\s+/g, '_').toLowerCase();
+  obcineFromTo(from, to, obcina);
 
   d3.select(this)
     .transition()

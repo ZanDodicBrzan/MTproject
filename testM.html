@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kung flu</title>
+</head>
+<body>
+    <form id="form">
+        <input type="date" name="from" id="from" />
+        <input type="date" name="to" id="to" />
+        <input type="submit" />
+    </form>
+    <div id="results">
+
+    </div>
+</body>
+    <script>
+
+// naredu funkcijo, da ni treba pol vedno dat document.getElementById ce se hoce kj pisat, sam shorthand npr: _id("results")
+const _id = (id) => document.getElementById(id);
+
+// funk. za pridobivanje podatkov
+async function getData(url) {
+  return fetch(url)
+  .then(res => {
+          if (!res.ok) {
+              throw new Error(res.error);
+          }
+          return res;
+   })
+  .then(res => res.json())
+  .catch(err => console.log(err));
+}
+
+function izpisPodatkov(imeObcine, podatki) {
+    _id("results").insertAdjacentHTML('beforeend', `<div classname='obcina'>
+        <b>${imeObcine}:</b>
+        <ul>
+            <li>Aktivne okužbe: ${podatki.activeCases}</li>
+            <li>Vsi potrjeni do datuma: ${podatki.confirmedToDate}</li>
+            <li>Št. umrlih do datuma: ${podatki.deceasedToDate}</li>
+        </ul>
+        </div>`)
+};
+
+// funk. obcine from, to, take funkcije ki se zacnejo s const neki = () => {} je krajsi zapis funkcije lahko se pa nardi tko kot je getData zgori
+const obcineFromTo = async(from, to) => {
+    console.log(from);
+    let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
+    Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
+        const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
+        arrayRegij.forEach(regija => {
+            Object.entries(regija).forEach(([imeObcine, podatki]) => izpisPodatkov(imeObcine, podatki))
+        })
+    })
+};
+
+const submit = (e) => {
+    e.preventDefault();
+    const from = _id("from").value;
+    const to = _id("to").value;
+    obcineFromTo(from,to);
+}
+_id("form").onsubmit=submit;
+
+    </script>
+</html>

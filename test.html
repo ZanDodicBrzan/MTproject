@@ -87,12 +87,15 @@ let to = "2020-10-10";
 
 let datum = document.getElementById("date");
 
-datum.addEventListener("change" , (event) =>{
+datum.addEventListener("change" , async(event) =>{
   document.getElementById("selected-date").innerHTML = datum.value;
-  let stats = getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
-  
-  document.getElementById("active-on-date").innerHTML = stats.performedTests;
-  document.getElementById("confirmed-on-date").innerHTML = stats.positiveTests;
+  from = document.getElementById("date").value;
+  to = document.getElementById("date").value;
+  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+
+  console.log(stats[0]);
+  document.getElementById("active-on-date").innerHTML = stats[0].performedTests;
+  document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
   //if(podatki.deceasedToDate==undefined) document.getElementById("deaths-on-date").innerHTML = "0";
   //else document.getElementById("deaths-on-date").innerHTML = podatki.deceasedToDate;
 

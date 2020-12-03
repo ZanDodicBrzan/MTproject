@@ -91,17 +91,21 @@ datum.addEventListener("change" , async(event) =>{
   document.getElementById("selected-date").innerHTML = datum.value;
   from = document.getElementById("date").value;
   to = document.getElementById("date").value;
-  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
-
+  
   console.log(stats[0]);
   document.getElementById("active-on-date").innerHTML = stats[0].performedTests;
   document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
-  //if(podatki.deceasedToDate==undefined) document.getElementById("deaths-on-date").innerHTML = "0";
-  //else document.getElementById("deaths-on-date").innerHTML = podatki.deceasedToDate;
+  
 
+  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
   let deaths = stats[0].deceasedPerAgeToDate;
   for(let i = 0; i<Object.keys(deaths).length; i++){
-    for(let j = 0; )
+    if("allToDate" in deaths[i]){
+      console.log(deaths[i].allToDate);
+    }
+    else{
+      console.log("0");
+    }
   }
 
 });
@@ -206,7 +210,7 @@ async function getData(url) {
 const obcineFromTo = async(from, to, obcina) => {
   from = document.getElementById("date").value;
   to = document.getElementById("date").value;
-  console.log(from);
+
 
   let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
   Object.keys(podatkiObcinZaEnMesec).forEach(dan => {

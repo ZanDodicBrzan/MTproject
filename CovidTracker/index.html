@@ -47,7 +47,7 @@
           <li class="active"><a href="#intro">Home</a></li>
           <li><a href="#about">Zemljevid</a></li>
           <li><a href="#services">Statistika</a></li>
-          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#portfolio">Graphs</a></li>
         </ul>
       </nav><!-- .main-nav -->
       
@@ -72,10 +72,48 @@
         </div>
       </div>
 
-    </div>
+    </div> 
   </section><!-- #intro -->
 
   <main id="main">
+
+  <!--==========================
+    Daily Stats Section
+  ============================-->
+
+    <section id="why-us" class="wow fadeIn">
+      <div class="container">
+        <header class="section-header">
+          <h3>Najnovejši Podatki</h3>
+          <p>Podatki lahko zaostajajo za en dan odvisno od ure.</p>
+        </header>
+
+        <div class="row counters">
+
+          <div class="col-lg-3 col-6 text-center">
+            <span data-toggle="counter-up">274</span>
+            <p>Clients</p>
+          </div>
+
+          <div class="col-lg-3 col-6 text-center">
+            <span data-toggle="counter-up">421</span>
+            <p>Projects</p>
+          </div>
+
+          <div class="col-lg-3 col-6 text-center">
+            <span data-toggle="counter-up">1,364</span>
+            <p>Hours Of Support</p>
+          </div>
+
+          <div class="col-lg-3 col-6 text-center">
+            <span data-toggle="counter-up">18</span>
+            <p>Hard Workers</p>
+          </div>
+  
+        </div>
+
+      </div>
+    </section>
 
     <!--==========================
       Zemljevid 
@@ -88,13 +126,43 @@
           <p>Zemljevid slovenije razdeljen po občinah.</p>
         </header>
 
-        <div id="zemljevid">
-          <h3>Trenutna občina:</h3>
-          <h2><div class="obcina">Nič</div></h2>
-          <h4>Aktivni Primeri</h4><h4 id="active"></h4>
-          <h4>Potrjeni Primeri</h4><h4 id="confirmed"></h4>
-          <h4>Umrli</h4><h4 id="deaths"></h4>
+        <div id="zemljevid" class="row row-eq-height justify-content-center">
 
+          <div class="col-lg-4 mb-4">
+            <div class="card wow bounceInUp">
+              <div class="card-body">
+                <h5 class="card-title">Trenutna občina:</h5>
+                <p class="card-text"><div class="obcina">Nič</div></p>
+                <a href="#" class="readmore">Podrobneje </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 mb-4">
+            <div class="card wow bounceInUp">
+              <div class="card-body">
+                <h5 class="card-title">Aktivni Primeri:</h5>
+                <p class="card-text" id="active"></p>
+                <h5 class="card-title">Potrjeni Primeri:</h5>
+                <p class="card-text" id="confirmed"></p>
+                <a href="#" class="readmore">Podrobneje </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 mb-4">
+            <div class="card wow bounceInUp">
+              <div class="card-body">
+                <h5 class="card-title">Umrli:</h5>
+                <p class="card-text" id="deaths"></p>
+                <a href="#" class="readmore">Podrobneje </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        
+        <div id="zemljevid">
           <!-- Tukaj tipo daš nek place holder kjer bo mapa -->
           <svg id="placeH" width="1000px" height="700px">
             <g class="map"></g>
@@ -104,13 +172,13 @@
     </section><!-- #about -->
 
     <!--==========================
-      Services Section
+      Statistika Section
     ============================-->
     <section id="services" class="section-bg">
       <div class="container">
 
         <header class="section-header">
-          <h3>Services</h3>
+          <h3>Statistika</h3>
           <p>Laudem latine persequeris id sed, ex fabulas delectus quo. No vel partiendo abhorreant vituperatoribus.</p>
         </header>
 
@@ -173,7 +241,7 @@
       <div class="container">
 
         <header class="section-header">
-          <h3 class="section-title">Our Portfolio</h3>
+          <h3 class="section-title">Graphs</h3>
         </header>
 
         <div class="row">

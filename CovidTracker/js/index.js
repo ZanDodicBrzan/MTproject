@@ -6,11 +6,11 @@ var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
 today =mm + '-' + dd + '-' + yyyy;
-console.log(today);
-
+//console.log(today);
+let stats;
 //prikazi današnje statse
 const DisplayCurrent = async() => {
-    let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
+    stats= await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
     
     document.getElementById("deceased-today").innerHTML = stats[0].statePerTreatment.deceased;
     document.getElementById("active-today").innerHTML = stats[0].cases.active;
@@ -102,8 +102,8 @@ update(json)
 
 //const from = _id("from").value;
 //const to =  _id("to").value;
-const from = "2020-10-10";
-const to = "2020-10-10";
+let from = today;
+let to = today;
 
 // funkcija za pridobivanje podatkov
 async function getData(url) {
@@ -139,11 +139,35 @@ Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
     })
 })
 };
-console.log(obcine);
 
 $( function() {
 	$( "#datepicker" ).datepicker({
 		dateFormat: "dd-mm-yy"
 		,	duration: "fast"
-	});
-} );
+  });
+  
+});
+
+let datum = document.getElementById("date");
+
+datum.addEventListener('change' , async(event) =>{  
+  from = document.getElementById("date").value;
+  to = document.getElementById("date").value;
+  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+
+  //console.log(stats[0]);
+  //document.getElementById("active-on-date").innerHTML = stats[0].performedTests;
+  //document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
+  
+  let deaths = stats[0].deceasedPerAgeToDate;
+  for(let i = 0; i<Object.keys(deaths).length; i++){
+    if("allToDate" in deaths[i]){
+      //console.log(deaths[i].allToDate);
+    }
+    else{
+      //console.log("0");
+    }
+  }
+
+});
+console.log(stats);

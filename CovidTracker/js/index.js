@@ -19,6 +19,20 @@ const DisplayCurrent = async() => {
 };
 DisplayCurrent();
 
+const values = async() => {
+    return d.value.properties.confirmed;
+});
+
+const minVal = d3.min(values);
+const maxVal = d3.max(values);
+
+const color = d3
+    .scaleLinear()
+    .domain([minVal, 1, maxVal])
+    .range(["#eee", "#fee", "#f00"]);
+
+
+
 var projection = d3.geoMercator()
 .scale(16000)
 .translate([200, 280])
@@ -70,6 +84,10 @@ var u = d3.select('#zemljevid g.map')
 
 u.enter()
   .append('path')
+  .attr("stroke", "#000")
+  .attr("stroke-width", 0.5)
+  .attr("fill", function(d, i) {
+    return color(d.properties.confirmed);})
   .attr('d', geoGenerator)
   .on('mouseover', handleMouseover)
   .on('mouseout', handleMouseout)

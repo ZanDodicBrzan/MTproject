@@ -1,4 +1,6 @@
 
+let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+
 var projection = d3.geoMercator()
 .scale(15000)
 .translate([200, 280])

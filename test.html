@@ -99,7 +99,21 @@ datum.addEventListener("change" , async(event) =>{
   //if(podatki.deceasedToDate==undefined) document.getElementById("deaths-on-date").innerHTML = "0";
   //else document.getElementById("deaths-on-date").innerHTML = podatki.deceasedToDate;
 
+  let deaths = stats[0].deceasedPerAgeToDate;
+  for(let i = 0; i<Object.keys(deaths).length; i++){
+    for(let j = 0; )
+  }
+
 });
+
+let podatkiSmrti = async() => {
+  from = document.getElementById("date").value;
+  to = document.getElementById("date").value;
+  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+
+  let deaths = stats[0].deceasedPerAgeToDate;
+};
+
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------

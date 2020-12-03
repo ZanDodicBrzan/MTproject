@@ -21,7 +21,7 @@ DisplayCurrent();
 
 const values = async() => {
     return d.value.properties.confirmed;
-});
+};
 
 const minVal = d3.min(values);
 const maxVal = d3.max(values);
@@ -118,15 +118,18 @@ return fetch(url)
     .catch(err => console.log(err));
 }
 
+let obcine = {};
+
 const obcineFromTo = async(from, to, obcina) => {
 let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
 Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
     const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
-    
+
     arrayRegij.forEach(regija => {
-        Object.entries(regija).forEach(([imeObcine, podatki]) => {
+      obcine = Object.assign(obcine, regija);
+      Object.entries(regija).forEach(([imeObcine, podatki]) => {
           if(imeObcine == obcina){
-            console.log(podatki);
+            //console.log(podatki);
             document.getElementById("active").innerHTML = podatki.activeCases;
             document.getElementById("confirmed").innerHTML = podatki.confirmedToDate;
             if(podatki.deceasedToDate==undefined) document.getElementById("deaths").innerHTML = "0";
@@ -136,6 +139,7 @@ Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
     })
 })
 };
+console.log(obcine);
 
 $( function() {
 	$( "#datepicker" ).datepicker({

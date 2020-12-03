@@ -88,6 +88,7 @@ let to = "2020-10-10";
 let datum = document.getElementById("date");
 
 datum.addEventListener("change" , async(event) =>{
+  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
   document.getElementById("selected-date").innerHTML = datum.value;
   from = document.getElementById("date").value;
   to = document.getElementById("date").value;
@@ -96,8 +97,6 @@ datum.addEventListener("change" , async(event) =>{
   document.getElementById("active-on-date").innerHTML = stats[0].performedTests;
   document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
   
-
-  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
   let deaths = stats[0].deceasedPerAgeToDate;
   for(let i = 0; i<Object.keys(deaths).length; i++){
     if("allToDate" in deaths[i]){

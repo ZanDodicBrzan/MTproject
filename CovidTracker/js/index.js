@@ -1,14 +1,31 @@
 
-let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+// včerajšnji dan datum
+var today = new Date();
+var dd = String(today.getDate()-1).padStart(2, '0');
+var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+var yyyy = today.getFullYear();
+
+today =mm + '-' + dd + '-' + yyyy;
+console.log(today);
+
+//prikazi današnje statse
+const DisplayCurrent = async() => {
+    let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
+    
+    document.getElementById("deceased-today").innerHTML = stats[0].statePerTreatment.deceased;
+    document.getElementById("active-today").innerHTML = stats[0].cases.active;
+    document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
+    document.getElementById("tests-today").innerHTML = stats[0].performedTests;
+};
+DisplayCurrent();
 
 var projection = d3.geoMercator()
-.scale(15000)
+.scale(16000)
 .translate([200, 280])
-.center([14, 46.3]);
+.center([13.85, 46.3]);
 
 var geoGenerator = d3.geoPath()
 .projection(projection);
-
 
 // ko daš miško čez
 function handleMouseover(d) {
@@ -73,14 +90,14 @@ const to = "2020-10-10";
 // funkcija za pridobivanje podatkov
 async function getData(url) {
 return fetch(url)
-.then(res => {
-        if (!res.ok) {
-            throw new Error(res.error);
-        }
-        return res;
- })
-.then(res => res.json())
-.catch(err => console.log(err));
+    .then(res => {
+            if (!res.ok) {
+                throw new Error(res.error);
+            }
+            return res;
+    })
+    .then(res => res.json())
+    .catch(err => console.log(err));
 }
 
 const obcineFromTo = async(from, to, obcina) => {
@@ -101,3 +118,10 @@ Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
     })
 })
 };
+
+$( function() {
+	$( "#datepicker" ).datepicker({
+		dateFormat: "dd-mm-yy"
+		,	duration: "fast"
+	});
+} );

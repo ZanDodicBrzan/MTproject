@@ -3,7 +3,7 @@
 }
 
 #zemljevid .map path {
-  fill: #5a5b56;
+  fill:  #007bff;
   stroke: #fff;
 }
 
@@ -363,11 +363,6 @@ h6 {
 --------------------------------------------------------------*/
 
 /* Desktop Navigation */
-
-.main-nav {
-  /* Drop Down */
-  /* Deep Drop Down */
-}
 
 .main-nav,
 .main-nav * {

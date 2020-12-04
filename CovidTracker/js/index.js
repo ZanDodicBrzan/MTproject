@@ -1,13 +1,14 @@
 
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-1).padStart(2, '0');
+var dd = String(today.getDate()-2).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
-today =mm + '-' + dd + '-' + yyyy;
-//console.log(today);
+today = mm + '-' + dd + '-' + yyyy;
+
 let stats;
+
 //prikazi današnje statse
 const DisplayCurrent = async() => {
     stats= await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
@@ -53,7 +54,6 @@ d3.select(this)
   .transition()
   .duration('50')
   .attr('opacity', '.60')
-  //.style("stroke", "black"); obroba ne dela for some reason xddd
 }
 
 // ko daš miško dol
@@ -65,7 +65,6 @@ d3.select(this)
   .transition()
   .duration('50')
   .attr('opacity', '1')
-  //.style("stroke", "white");
 }
 
 // ko klikneš ni še dopolnjeno tu damo statse in to nekam prikažemo in to
@@ -100,8 +99,6 @@ d3.json('data/svn_regional.geojson', function(err, json) {
 update(json)
 })
 
-//const from = _id("from").value;
-//const to =  _id("to").value;
 let from = today;
 let to = today;
 
@@ -119,6 +116,7 @@ return fetch(url)
 }
 
 let obcine = {};
+
 
 const obcineFromTo = async(from, to, obcina) => {
 let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
@@ -140,6 +138,39 @@ Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
 })
 };
 
+var min = 999999999;
+var max = 0;
+const barvanjeMape = async(from, to) => {
+    let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
+    Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
+        const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
+        
+        arrayRegij.forEach(regija => {
+          obcine = Object.assign(obcine, regija);
+          Object.entries(regija).forEach(([imeObcine, podatki]) => {
+                //console.log(podatki.activeCases);
+                if (podatki.activeCases > max ) max = podatki.activeCases;
+                if (podatki.activeCases < min ) min = podatki.activeCases;
+                //console.log(podatki);
+                //document.getElementById("active").innerHTML = podatki.activeCases;
+                //document.getElementById("confirmed").innerHTML = podatki.confirmedToDate;
+                //if(podatki.deceasedToDate==undefined) document.getElementById("deaths").innerHTML = "0";
+                //else document.getElementById("deaths").innerHTML = podatki.deceasedToDate;
+              
+            })
+        })
+    })
+    console.log("min:" + min + " " + "max: " + max);
+    };
+barvanjeMape(from, to);
+
+//console.log("min:" + min + " " + "max: " + max);
+ 
+//var keys  = Object.keys(obcine).sort(function(a,b) { return obcine[a] - obcine[b]; });
+//var match = keys.filter(function(x) { return obcine[x] === obcine[keys[0]]; });
+//console.log(match);
+
+//izbira datuma
 $( function() {
 	$( "#datepicker" ).datepicker({
 		dateFormat: "dd-mm-yy"
@@ -170,4 +201,4 @@ datum.addEventListener('change' , async(event) =>{
   }
 
 });
-console.log(stats);
+//console.log(stats);

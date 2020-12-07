@@ -1,4 +1,3 @@
-
 // včerajšnji dan datum
 var today = new Date();
 var dd = String(today.getDate()-2).padStart(2, '0');
@@ -8,6 +7,48 @@ var yyyy = today.getFullYear();
 today = mm + '-' + dd + '-' + yyyy;
 
 let stats;
+let from = today;
+let to = today;
+
+const obcineFromTo = async(from, to, obcina) => {
+  let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
+  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+  
+  
+  Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
+      const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
+  
+      arrayRegij.forEach(regija => {
+        obcine = Object.assign(obcine, regija);
+        Object.entries(regija).forEach(([imeObcine, podatki]) => {
+            if(imeObcine == obcina){
+  
+              if(podatki.activeCases==undefined) document.getElementById("active").innerHTML = "0";
+              else document.getElementById("active").innerHTML = podatki.activeCases;
+  
+              if(podatki.confirmedToDate==undefined) document.getElementById("confirmed").innerHTML = "0";
+              else document.getElementById("confirmed").innerHTML = podatki.confirmedToDate;
+              
+              if(podatki.deceasedToDate==undefined) document.getElementById("deaths").innerHTML = "0";
+              else document.getElementById("deaths").innerHTML = podatki.deceasedToDate;
+            }
+            //ni izbrane občine -> prikazujemo skupne podatke za slovenijo
+            if(obcina == "none"){
+              
+              if(stats[0].cases.active==undefined) document.getElementById("active").innerHTML = "0";
+              else document.getElementById("active").innerHTML = stats[0].cases.active;
+  
+              if(stats[0].positiveTests==undefined) document.getElementById("confirmed").innerHTML = "0";
+              else document.getElementById("confirmed").innerHTML = stats[0].positiveTests;
+              
+              if(stats[0].statePerTreatment.deceased==undefined) document.getElementById("deaths").innerHTML = "0";
+              else document.getElementById("deaths").innerHTML = stats[0].statePerTreatment.deceased;
+  
+            }
+          })
+      })
+  })
+  };
 
 //prikazi današnje statse
 const DisplayCurrent = async() => {
@@ -19,6 +60,7 @@ const DisplayCurrent = async() => {
     document.getElementById("tests-today").innerHTML = stats[0].performedTests;
 };
 DisplayCurrent();
+obcineFromTo(from,to,"none");
 
 const values = async() => {
     return d.value.properties.confirmed;
@@ -59,7 +101,10 @@ d3.select(this)
 // ko daš miško dol
 function handleMouseout(d) {
 d3.select('#zemljevid .obcina')
-  .text("Nič");
+  .text("Skupno v Sloveniji");
+
+let obcina = "none";
+obcineFromTo(from, to, obcina);
 
 d3.select(this)
   .transition()
@@ -99,8 +144,7 @@ d3.json('data/svn_regional.geojson', function(err, json) {
 update(json)
 })
 
-let from = today;
-let to = today;
+
 
 // funkcija za pridobivanje podatkov
 async function getData(url) {
@@ -117,26 +161,6 @@ return fetch(url)
 
 let obcine = {};
 
-
-const obcineFromTo = async(from, to, obcina) => {
-let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
-Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
-    const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
-
-    arrayRegij.forEach(regija => {
-      obcine = Object.assign(obcine, regija);
-      Object.entries(regija).forEach(([imeObcine, podatki]) => {
-          if(imeObcine == obcina){
-            //console.log(podatki);
-            document.getElementById("active").innerHTML = podatki.activeCases;
-            document.getElementById("confirmed").innerHTML = podatki.confirmedToDate;
-            if(podatki.deceasedToDate==undefined) document.getElementById("deaths").innerHTML = "0";
-            else document.getElementById("deaths").innerHTML = podatki.deceasedToDate;
-          }
-        })
-    })
-})
-};
 
 var min = 999999999;
 var max = 0;
@@ -186,6 +210,7 @@ datum.addEventListener('change' , async(event) =>{
   to = document.getElementById("date").value;
   let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
 
+  obcineFromTo(from,to,"none");
   //console.log(stats[0]);
   //document.getElementById("active-on-date").innerHTML = stats[0].performedTests;
   //document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
@@ -201,4 +226,3 @@ datum.addEventListener('change' , async(event) =>{
   }
 
 });
-//console.log(stats);

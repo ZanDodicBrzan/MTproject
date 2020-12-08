@@ -23,7 +23,6 @@ const obcineFromTo = async(from, to, obcina) => {
       const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
   
       arrayRegij.forEach(regija => {
-        obcine = Object.assign(obcine, regija);
         Object.entries(regija).forEach(([imeObcine, podatki]) => {
 
             // map za podatke občin in min in max kativnih primerov
@@ -117,27 +116,38 @@ var projection = d3.geoMercator()
 var geoGenerator = d3.geoPath()
 .projection(projection);
 
-//color = d3.scaleQuantize([1, 7], d3.schemeBlues[6])
+color = d3.scaleQuantize([1, 7], d3.schemeBlues[6])
 
 // update live 
 function update(geojson) {
-var u = d3.select('#zemljevid g.map')
+var u = d3.select('g.map')
   .selectAll('path')
   .data(geojson.features)
+  //.append(() => legend({color, title: obcine.imeObcine, width: 260}))
+u.append("g")
+  .attr("transform", "translate(610,20)")
+  .append(() => legend({color, title: obcine.imeObcine, width: 260}));
+
 
 u.enter()
   .append('path')
+  .attr("fill", "none")
   .attr("stroke", "#000")
   .attr("stroke-width", 0.5)
-  .attr('d', geoGenerator)
+  .attr('d', pathGenerator)
   .on('mouseover', handleMouseover)
   .on('mouseout', handleMouseout)
   .on("click", onClick)
 }
 
 
+var zemljevid1 = d3.json('data/svn_regional.geojson');
+var projection1 = d3.geoMercator().scale(16000).translate([200, 280]).center([13.85, 46.3]);
+var pathGenerator = d3.geoPath().projection(projection1);
+
+
 // podatki ----------------------------------------------------------
-d3.json('data/svn_regional.geojson', function(err, json) {
+var zemljevid = d3.json('data/svn_regional.geojson', function(err, json) {
 update(json)
 })
 

@@ -1,6 +1,6 @@
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-1).padStart(2, '0');
+var dd = String(today.getDate()-2).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
@@ -135,11 +135,19 @@ u.enter()
   .on("click", onClick)
 }
 
-
+var tmp = "";
 // podatki ----------------------------------------------------------
-d3.json('data/svn_regional.geojson', function(err, json) {
+/*d3.json('data/svn_regional.geojson', function(err, json) {
+console.log(err)  
+tmp = json;
 update(json)
-})
+})*/
+
+d3.json("data/svn_regional.geojson")
+  .then(function(json){
+    tmp = json;
+    update(json)
+  });
 
 // funkcija za pridobivanje podatkov
 async function getData(url) {

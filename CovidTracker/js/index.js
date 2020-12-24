@@ -1,6 +1,6 @@
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-2).padStart(2, '0');
+var dd = String(today.getDate()-1).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
@@ -9,6 +9,7 @@ today = mm + '-' + dd + '-' + yyyy;
 let stats;
 let from = today;
 let to = today;
+let deathsPerAge;
 
 var obcine = new Map();
 var min = 999999999;
@@ -135,19 +136,11 @@ u.enter()
   .on("click", onClick)
 }
 
-var tmp = "";
-// podatki ----------------------------------------------------------
-/*d3.json('data/svn_regional.geojson', function(err, json) {
-console.log(err)  
-tmp = json;
-update(json)
-})*/
 
-d3.json("data/svn_regional.geojson")
-  .then(function(json){
-    tmp = json;
-    update(json)
-  });
+// podatki ----------------------------------------------------------
+d3.json('data/svn_regional.geojson', function(err, json) {
+update(json)
+})
 
 // funkcija za pridobivanje podatkov
 async function getData(url) {
@@ -179,18 +172,92 @@ datum.addEventListener('change' , async(event) =>{
   let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
 
   obcineFromTo(from,to,"none");
-  //console.log(stats[0]);
-  //document.getElementById("active-on-date").innerHTML = stats[0].performedTests;
-  //document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
+
+  deathsPerAge = [];
   
   let deaths = stats[0].deceasedPerAgeToDate;
   for(let i = 0; i<Object.keys(deaths).length; i++){
     if("allToDate" in deaths[i]){
-      //console.log(deaths[i].allToDate);
+      let fromAge=deaths[i].ageFrom;
+      let toAge=deaths[i].ageTo;
+      if(toAge== undefined){
+        ageGroup = fromAge + "+ ";
+      }
+      else{
+        ageGroup = fromAge + "-" + toAge;
+      }
+      
+      deathsPerAge.push({age_group:ageGroup, deaths:deaths[i].allToDate});
+      
+
     }
     else{
-      //console.log("0");
+      ageGroup = deaths[i].ageFrom + "-" + deaths[i].ageTo;
+      deathsPerAge.push({age_group:ageGroup, deaths:0});
     }
   }
-
+  console.log(deathsPerAge);  
 });
+
+var tip = d3.select(".chart-container")
+	.append("div")
+  .attr("class", "tip")
+	.style("position", "absolute")
+	.style("z-index", "10")
+	.style("visibility", "hidden");
+
+var svg = d3.select("svg").attr("class", "background-style"),
+    margin = {top: 20, right: 20, bottom: 42, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.05),
+    y = d3.scaleLinear().rangeRound([height, 0]);
+
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    
+d3.json("apiPlaceholderURL", function(error, data) {
+  //if (error) throw error;
+
+  data = deathsPerAge;
+  
+  x.domain(data.map(function(d) { return d.age_group; }));
+  y.domain([0, d3.max(data, function(d) { return d.deaths; })]);
+
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+   .append("text")
+      .attr("y", 6)
+      .attr("dy", "2.5em")
+      .attr("dx", width/2 - margin.left)
+      .attr("text-anchor", "start")
+      .text("Grad Year");
+
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y).ticks(10))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Student Count");
+ 
+
+  g.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.age_group); })
+      .attr("y", function(d) { return y(d.deaths); })
+      .attr("width", x.bandwidth())
+      .attr("height", function(d) { return height - y(d.deaths)})
+      .on("mouseover", function(d) {return tip.text(d.deaths).style("visibility", "visible").style("top", y(d.deaths) - 13+ 'px' ).style("left", x(d.age_group) + x.bandwidth() - 12 + 'px')})
+	    //.on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+	    .on("mouseout", function(){return tip.style("visibility", "hidden");});
+  });
+

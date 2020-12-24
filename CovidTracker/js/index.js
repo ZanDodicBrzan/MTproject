@@ -76,9 +76,9 @@ obcineFromTo(from,to,"none");
 // ko daš miško čez
 function handleMouseover(d) {
   d3.select('#zemljevid .obcina')
-    .text(d.properties.name);
+    .text(d.toElement.className);
   
-  let obcina = (d.properties.name).replace(/\s+/g, '_').toLowerCase();
+  let obcina = (d.toElement.className).replace(/\s+/g, '_').toLowerCase();
   obcineFromTo(from, to, obcina);
   
   d3.select(this)

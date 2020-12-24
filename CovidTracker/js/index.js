@@ -138,9 +138,10 @@ u.enter()
 
 
 // podatki ----------------------------------------------------------
-d3.json('data/svn_regional.geojson', function(err, json) {
-update(json)
-})
+d3.json("data/svn_regional.geojson")
+  .then(function(json){
+    update(json)
+});
 
 // funkcija za pridobivanje podatkov
 async function getData(url) {

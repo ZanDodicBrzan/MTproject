@@ -51,6 +51,7 @@ var geoGenerator = d3.geoPath()
 
 // ko daš miško čez
 function handleMouseover(d) {
+  console.log(d);
   d3.select('#content .obcina')
     .text(d.properties.name);
 
@@ -89,7 +90,7 @@ function update(geojson) {
   var u = d3.select('#content g.map')
     .selectAll('path')
     .data(geojson.features);
-
+  console.log(geoGenerator);
   u.enter()
     .append('path')
     .attr('d', geoGenerator)

@@ -1,6 +1,6 @@
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-1).padStart(2, '0');
+var dd = String(today.getDate()-2).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
@@ -19,7 +19,6 @@ const obcineFromTo = async(from, to, obcina) => {
   let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
   let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
   
-  
   Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
       const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
   
@@ -32,6 +31,7 @@ const obcineFromTo = async(from, to, obcina) => {
             obcine.set(imeObcine, podatek);
             if (podatki.activeCases > max ) max = podatki.activeCases;
             if (podatki.activeCases < min ) min = podatki.activeCases;
+            
 
             if(imeObcine == obcina){
   
@@ -75,11 +75,12 @@ DisplayCurrent();
 obcineFromTo(from,to,"none");
 
 // ko daš miško čez
-function handleMouseover(d) {
+function handleMouseover(d,a) {
   d3.select('#zemljevid .obcina')
-    .text(d.toElement.className);
+    .text(a.properties.name);
   
-  let obcina = (d.toElement.className).replace(/\s+/g, '_').toLowerCase();
+  let obcina = (a.properties.name).replace(/\s+/g, '_').toLowerCase();
+  
   obcineFromTo(from, to, obcina);
   
   d3.select(this)
@@ -90,7 +91,7 @@ function handleMouseover(d) {
   
   // ko daš miško dol
 function handleMouseout(d) {
-  d3.select('#zemljevid .obcina')
+  d3.select('zemljevid .obcina')
     .text("Skupno v Sloveniji");
 
   let obcina = "none";
@@ -125,6 +126,8 @@ function update(geojson) {
 var u = d3.select('#zemljevid g.map')
   .selectAll('path')
   .data(geojson.features)
+
+//console.log(geojson.features);
 
 u.enter()
   .append('path')

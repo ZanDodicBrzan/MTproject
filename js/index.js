@@ -113,12 +113,23 @@ function handleMouseout(d) {
     .attr('opacity', '1')
 }
 
-// ko klikneš ni še dopolnjeno tu damo statse in to nekam prikažemo in to
-function onClick(d) {
-  d3.select(this)
-  .transition()
-  .duration('50')
-  .style("fill", "#e35d6a");
+// onClick --------------------------------------------------------------------
+function onClick(e, d) {
+  const imeObcine = d.properties.name.replace(/\s+/g, '_').toLowerCase();
+  if (!clicked.includes(imeObcine)) {
+    clicked.push(imeObcine)
+    d3.select(this)
+      .transition()
+      .duration('50')
+      .style("fill", "#e35d6a");
+  } else {
+    clicked = clicked.filter(ime => ime !== imeObcine);
+    let obcina = obcine.get(imeObcine)
+    d3.select(this)
+      .transition()
+      .duration('50')
+      .style("fill", d3.interpolateBlues(1-parseInt(obcina)/1001));
+  }
 }
 
 var projection = d3.geoMercator()

@@ -1,3 +1,4 @@
+
 // včerajšnji dan datum
 var today = new Date();
 var dd = String(today.getDate()-2).padStart(2, '0');
@@ -71,6 +72,7 @@ const DisplayCurrent = async() => {
     document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
     document.getElementById("tests-today").innerHTML = stats[0].performedTests;
 };
+
 DisplayCurrent();
 obcineFromTo(from,to,"none");
 
@@ -200,7 +202,9 @@ datum.addEventListener('change' , async(event) =>{
       deathsPerAge.push({age_group:ageGroup, deaths:0});
     }
   }
-  console.log(deathsPerAge);  
+  console.log(deathsPerAge);
+  
+  render();  
 });
 
 var tip = d3.select(".chart-container")
@@ -262,6 +266,84 @@ d3.json("apiPlaceholderURL", function(error, data) {
       .attr("height", function(d) { return height - y(d.deaths)})
       .on("mouseover", function(d) {return tip.text(d.deaths).style("visibility", "visible").style("top", y(d.deaths) - 13+ 'px' ).style("left", x(d.age_group) + x.bandwidth() - 12 + 'px')})
 	    //.on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-	    .on("mouseout", function(){return tip.style("visibility", "hidden");});
-  });
+      .on("mouseout", function(){return tip.style("visibility", "hidden");});
+});
+
+
+
+
+
+const render = async(x) => {
+
+  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+
+  //obcineFromTo(from,to,"none");
+
+  deathsPerAge = [];
+  
+  let deaths = stats[0].deceasedPerAgeToDate;
+  let max = 0;
+
+  for(let i = 0; i<Object.keys(deaths).length; i++){
+    if("allToDate" in deaths[i]){
+      let fromAge=deaths[i].ageFrom;
+      let toAge=deaths[i].ageTo;
+      if(toAge== undefined){
+        ageGroup = fromAge + "+ ";
+      }
+      else{
+        ageGroup = fromAge + "-" + toAge;
+      }
+      if(deaths[i].allToDate>max) max = deaths[i].allToDate;
+      deathsPerAge.push({age_group:ageGroup, deaths:deaths[i].allToDate});
+      
+
+    }
+    else{
+      ageGroup = deaths[i].ageFrom + "-" + deaths[i].ageTo;
+      deathsPerAge.push({age_group:ageGroup, deaths:0});
+    }
+  }
+
+
+  console.log(deathsPerAge);
+  
+  const widthGraph = 800;
+  const heightGraph = 400;
+  const margin = {top:50, bottom:50, left:50, right:50};
+
+  const svgGraph = d3.select("#graphContainer")
+    .append("svg")
+    .attr("height" , heightGraph - margin.top - margin.bottom)
+    .attr("width" , widthGraph - margin.left - margin.right)
+    .attr("viewBox", [0, 0, widthGraph, heightGraph]);
+
+  const xAxis = d3.scaleBand()
+    .domain(d3.range(deathsPerAge.length))
+    .range([margin.left, widthGraph - margin.right])
+    .padding(0.1);
+  
+  
+  const yAxis = d3.scaleLinear()
+    .domain(0,max)
+    .range([heightGraph-margin.bottom-margin.top]);
+
+  svgGraph
+    .append("g")
+    .attr("fill" , "royalblue")
+    .selectAll("rect")
+    .data(deathsPerAge)
+    .join("rect")
+      .attr("x", (d,i) => xAxis(i))
+      .attr("y", (d) => yAxis(d.deaths))
+      .attr("height", d => yAxis(0) - yAxis(d.deaths))
+      .attr("width", xAxis.bandwidth());
+  
+  svg.node();
+
+};
+
+render(stats);
+
+
 

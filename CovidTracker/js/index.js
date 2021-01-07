@@ -332,7 +332,7 @@ const render = async(x) => {
     .append("g")
     .attr("fill" , "royalblue")
     .selectAll("rect")
-    .data(deathsPerAge)
+    .data(deathsPerAge.sort((a,b) => d3.descending(a.age_group, b.deaths)))
     .join("rect")
       .attr("x", (d,i) => xAxis(i))
       .attr("y", (d) => yAxis(d.deaths))

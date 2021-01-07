@@ -15,18 +15,25 @@ let deathsPerAge;
 var obcine = new Map();
 var min = 999999999;
 var max = 0;
+var globalGeoJson;
+let podatkiObcinZaEnMesec;
 
-const obcineFromTo = async(from, to, obcina) => {
-  let podatkiObcinZaEnMesec = await getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
-  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+const getBetweenDates = async (from, to) => {
+  podatkiObcinZaEnMesec = getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
+  stats = getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+};
+getBetweenDates(from, to)
+
+const obcineFromTo = async (obcina) => {
+  let podatkiObcin = await podatkiObcinZaEnMesec;
+  let statsi = await stats;
   
-  Object.keys(podatkiObcinZaEnMesec).forEach(dan => {
-      const arrayRegij = Object.values(podatkiObcinZaEnMesec[dan].regions); // array regij
+  Object.keys(podatkiObcin).forEach(dan => {
+      const arrayRegij = Object.values(podatkiObcin[dan].regions); // array regij
   
       arrayRegij.forEach(regija => {
-        obcine = Object.assign(obcine, regija);
+        //obcine = Object.assign(obcine, regija);
         Object.entries(regija).forEach(([imeObcine, podatki]) => {
-
             // map za podatke občin in min in max kativnih primerov
             var podatek = podatki.activeCases;
             obcine.set(imeObcine, podatek);
@@ -48,20 +55,21 @@ const obcineFromTo = async(from, to, obcina) => {
             //ni izbrane občine -> prikazujemo skupne podatke za slovenijo
             if(obcina == "none"){
               
-              if(stats[0].cases.active==undefined) document.getElementById("active").innerHTML = "0";
-              else document.getElementById("active").innerHTML = stats[0].cases.active;
+              if(statsi[0].cases.active==undefined) document.getElementById("active").innerHTML = "0";
+              else document.getElementById("active").innerHTML = statsi[0].cases.active;
   
-              if(stats[0].positiveTests==undefined) document.getElementById("confirmed").innerHTML = "0";
-              else document.getElementById("confirmed").innerHTML = stats[0].positiveTests;
+              if(statsi[0].positiveTests==undefined) document.getElementById("confirmed").innerHTML = "0";
+              else document.getElementById("confirmed").innerHTML = statsi[0].positiveTests;
               
-              if(stats[0].statePerTreatment.deceased==undefined) document.getElementById("deaths").innerHTML = "0";
-              else document.getElementById("deaths").innerHTML = stats[0].statePerTreatment.deceased;
+              if(statsi[0].statePerTreatment.deceased==undefined) document.getElementById("deaths").innerHTML = "0";
+              else document.getElementById("deaths").innerHTML = statsi[0].statePerTreatment.deceased;
   
             }
           })
       })
   })
-  };
+  update(globalGeoJson);
+};
 
 //prikazi današnje statse
 const DisplayCurrent = async() => {
@@ -74,7 +82,7 @@ const DisplayCurrent = async() => {
 };
 
 DisplayCurrent();
-obcineFromTo(from,to,"none");
+//obcineFromTo(from,to,"none");
 
 // ko daš miško čez
 function handleMouseover(d,a) {
@@ -83,7 +91,7 @@ function handleMouseover(d,a) {
   
   let obcina = (a.properties.name).replace(/\s+/g, '_').toLowerCase();
   
-  obcineFromTo(from, to, obcina);
+  obcineFromTo(obcina);
   
   d3.select(this)
     .transition()
@@ -97,7 +105,7 @@ function handleMouseout(d) {
     .text("Skupno v Sloveniji");
 
   let obcina = "none";
-  obcineFromTo(from, to, obcina);
+  obcineFromTo(obcina);
 
   d3.select(this)
     .transition()
@@ -121,21 +129,22 @@ var projection = d3.geoMercator()
 var geoGenerator = d3.geoPath()
 .projection(projection);
 
-//color = d3.scaleQuantize([1, 7], d3.schemeBlues[6])
-
 // update live 
 function update(geojson) {
 var u = d3.select('#zemljevid g.map')
   .selectAll('path')
   .data(geojson.features)
 
-//console.log(geojson.features);
-
 u.enter()
   .append('path')
   .attr("stroke", "#000")
   .attr("stroke-width", 0.5)
   .attr('d', geoGenerator)
+    .attr("fill", function(d){
+      let neki = d.properties.name.replace(/\s+/g, '_').toLowerCase()
+      let obci = obcine.get(neki)
+      console.log(neki, obci)
+      return d3.interpolateBlues(1-parseInt(obci)/1001)})
   .on('mouseover', handleMouseover)
   .on('mouseout', handleMouseout)
   .on("click", onClick)
@@ -145,7 +154,8 @@ u.enter()
 // podatki ----------------------------------------------------------
 d3.json("data/svn_regional.geojson")
   .then(function(json){
-    update(json)
+    globalGeoJson = json;
+    obcineFromTo("none");
 });
 
 // funkcija za pridobivanje podatkov
@@ -164,46 +174,29 @@ return fetch(url)
 //izbira datuma
 $( function() {
 	$( "#datepicker" ).datepicker({
-		dateFormat: "dd-mm-yy"
-		,	duration: "fast"
+    dateFormat: "dd-mm-yy",
+    duration: "fast"
   });
   
 });
 
-let datum = document.getElementById("date");
+
+//------------------------------------------------------------
+
+let datum = document.getElementById("dateFrom");
+let datumDo = document.getElementById("dateTo");
 
 datum.addEventListener('change' , async(event) =>{  
-  from = document.getElementById("date").value;
-  to = document.getElementById("date").value;
-  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
+  from = document.getElementById("dateFrom").value || today;
+  to = document.getElementById("dateTo").value || today;
+  obcineFromTo("none");
+  render();  
+});
 
-  obcineFromTo(from,to,"none");
-
-  deathsPerAge = [];
-  
-  let deaths = stats[0].deceasedPerAgeToDate;
-  for(let i = 0; i<Object.keys(deaths).length; i++){
-    if("allToDate" in deaths[i]){
-      let fromAge=deaths[i].ageFrom;
-      let toAge=deaths[i].ageTo;
-      if(toAge== undefined){
-        ageGroup = fromAge + "+ ";
-      }
-      else{
-        ageGroup = fromAge + "-" + toAge;
-      }
-      
-      deathsPerAge.push({age_group:ageGroup, deaths:deaths[i].allToDate});
-      
-
-    }
-    else{
-      ageGroup = deaths[i].ageFrom + "-" + deaths[i].ageTo;
-      deathsPerAge.push({age_group:ageGroup, deaths:0});
-    }
-  }
-  console.log(deathsPerAge);
-  
+datumDo.addEventListener('change' , async(event) =>{  
+  from = document.getElementById("dateFrom").value || today;
+  to = document.getElementById("dateTo").value || today;
+  obcineFromTo("none");
   render();  
 });
 
@@ -274,9 +267,7 @@ d3.json("apiPlaceholderURL", function(error, data) {
 
 
 const render = async(x) => {
-
-  let stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
-
+  stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
   //obcineFromTo(from,to,"none");
 
   deathsPerAge = [];
@@ -306,7 +297,7 @@ const render = async(x) => {
   }
 
 
-  console.log(deathsPerAge);
+  //console.log(deathsPerAge);
   
   const widthGraph = 800;
   const heightGraph = 400;

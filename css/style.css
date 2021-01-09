@@ -1,3 +1,20 @@
+.chartZ {
+  right: 0px;
+  left: 0px;
+  top: 0px;
+  position: relative;
+  z-index: 1;
+}
+
+.textZ {
+  position: relative;
+  z-index: 399999;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
 #zemljevid .info {
   height: 20px;
 }
@@ -297,7 +314,7 @@ h6 {
   position: relative;
   background: url("../img/intro-bg.png") center bottom no-repeat;
   background-size: cover;
-  padding: 120px 0 60px 0;
+  padding: 120px 0 75px 0;
 }
 
 #intro .intro-img {
@@ -312,7 +329,7 @@ h6 {
 
 #intro .intro-info h2 {
   color: #fff;
-  margin-bottom: 40px;
+  margin-bottom: 45px;
   font-size: 48px;
   font-weight: 700;
 }
@@ -544,7 +561,7 @@ h6 {
   text-align: center;
   margin: auto;
   font-size: 15px;
-  padding-bottom: 60px;
+  padding-bottom: 40px;
   color: #556877;
   width: 50%;
 }

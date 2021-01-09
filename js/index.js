@@ -1,13 +1,14 @@
-
+//spremenljivke
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-2).padStart(2, '0');
+var dd = String(today.getDate()-1).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
 today = mm + '-' + dd + '-' + yyyy;
 
 let stats;
+let summary;
 let from = today;
 let to = today;
 let deathsPerAge;
@@ -17,6 +18,29 @@ var min = 999999999;
 var max = 0;
 var globalGeoJson;
 let podatkiObcinZaEnMesec;
+
+// --------------------------------------------------------------------------
+
+//prikazi današnje statse
+const DisplayCurrent = async() => {
+  stats= await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
+  summary = await getData(`https://api.sledilnik.org/api/summary?toDate=${today}`);
+
+  document.getElementById("deceased-today").innerHTML = stats[0].statePerTreatment.deceased;
+  document.getElementById("active-today").innerHTML = stats[0].cases.active;
+  document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
+  document.getElementById("tests-today").innerHTML = stats[0].performedTests;
+  document.getElementById("tests-hat").innerHTML = summary.testsTodayHAT.value;
+  document.getElementById("tests-pcr").innerHTML = summary.testsToday.value;
+  document.getElementById("vaccinated").innerHTML = summary.vaccinationSummary.value;
+  document.getElementById("hospital").innerHTML = summary.hospitalizedCurrent.value;
+  document.getElementById("intense").innerHTML = summary.icuCurrent.value;
+  document.getElementById("goodOut").innerHTML = summary.hospitalizedCurrent.subValues.out;
+};
+
+DisplayCurrent();
+
+//---------------------------------------------------------------------------------
 
 const getBetweenDates = async (from, to) => {
   podatkiObcinZaEnMesec = getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
@@ -71,19 +95,6 @@ const obcineFromTo = async (obcina) => {
   update(globalGeoJson);
 };
 
-//prikazi današnje statse
-const DisplayCurrent = async() => {
-    stats= await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
-    
-    document.getElementById("deceased-today").innerHTML = stats[0].statePerTreatment.deceased;
-    document.getElementById("active-today").innerHTML = stats[0].cases.active;
-    document.getElementById("confirmed-on-date").innerHTML = stats[0].positiveTests;
-    document.getElementById("tests-today").innerHTML = stats[0].performedTests;
-};
-
-DisplayCurrent();
-//obcineFromTo(from,to,"none");
-
 // ko daš miško čez
 function handleMouseover(d,a) {
   d3.select('#zemljevid .obcina')
@@ -132,6 +143,8 @@ function onClick(e, d) {
   }
 }
 
+// glaven prikaz -------------------------------------------------------------------
+
 var projection = d3.geoMercator()
 .scale(16000)
 .translate([200, 280])
@@ -154,8 +167,8 @@ u.enter()
     .attr("fill", function(d){
       let neki = d.properties.name.replace(/\s+/g, '_').toLowerCase()
       let obci = obcine.get(neki)
-      console.log(neki, obci)
-      return d3.interpolateBlues(1-parseInt(obci)/1001)})
+      //console.log(neki, obci)
+      return d3.interpolateBlues(parseInt(obci)/250)})
   .on('mouseover', handleMouseover)
   .on('mouseout', handleMouseout)
   .on("click", onClick)
@@ -230,7 +243,7 @@ var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     
-d3.json("apiPlaceholderURL", function(error, data) {
+/*d3.json("apiPlaceholderURL", function(error, data) {
   //if (error) throw error;
 
   data = deathsPerAge;
@@ -272,7 +285,7 @@ d3.json("apiPlaceholderURL", function(error, data) {
 	    //.on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
       .on("mouseout", function(){return tip.style("visibility", "hidden");});
 });
-
+*/
 
 
 

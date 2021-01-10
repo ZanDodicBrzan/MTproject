@@ -1461,3 +1461,8 @@ h6 {
     padding: 100px 0 20px 0;
   }
 }
+
+.rectangle:hover{
+  opacity:0.66;
+  fill: royalblue;
+}

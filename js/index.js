@@ -36,6 +36,8 @@ const DisplayCurrent = async() => {
   document.getElementById("hospital").innerHTML = summary.hospitalizedCurrent.value;
   document.getElementById("intense").innerHTML = summary.icuCurrent.value;
   document.getElementById("goodOut").innerHTML = summary.hospitalizedCurrent.subValues.out;
+
+  render();
 };
 
 DisplayCurrent();
@@ -284,73 +286,107 @@ var g = svg.append("g")
 
 
 
-const render = async(x) => {
+const render = async() => {
 
-  deathsPerAge = [];
+  let allToDate = [];
+  let maleToDate = [];
+  let femaleToDate = [];
   
-  let deaths = stats[0].deceasedPerAgeToDate;
+  let perAgeData = await stats[0].statePerAgeToDate;
   let max = 0;
+  
+  for(let i = 0; i<Object.keys(perAgeData).length; i++){
+    
+    let fromAge=perAgeData[i].ageFrom;
+    let toAge=perAgeData[i].ageTo;
+    let ageGroup;
 
-  for(let i = 0; i<Object.keys(deaths).length; i++){
-    if("allToDate" in deaths[i]){
-      let fromAge=deaths[i].ageFrom;
-      let toAge=deaths[i].ageTo;
-      if(toAge== undefined){
-        ageGroup = fromAge + "+ ";
-      }
-      else{
-        ageGroup = fromAge + "-" + toAge;
-      }
-      if(deaths[i].allToDate>max) max = deaths[i].allToDate;
-      deathsPerAge.push({age_group:ageGroup, deaths:deaths[i].allToDate});
-      
-
+    if(toAge== undefined){
+      ageGroup = fromAge + "+ ";
     }
     else{
-      ageGroup = deaths[i].ageFrom + "-" + deaths[i].ageTo;
-      deathsPerAge.push({age_group:ageGroup, deaths:0});
+      ageGroup = fromAge + "-" + toAge;
     }
+    if(perAgeData[i].allToDate > max) max = perAgeData[i].allToDate;
+    
+    //console.log(ageGroup);
+    
+    allToDate.push({ageGroup:ageGroup, allToDate: perAgeData[i].allToDate});
+    
   }
+  console.log(perAgeData);
+  console.log(allToDate);
 
-
-  //console.log(deathsPerAge);
-  
   const widthGraph = 800;
   const heightGraph = 400;
   const margin = {top:50, bottom:50, left:50, right:50};
 
   const svgGraph = d3.select("#graphContainer")
-    .append("svg")
     .attr("height" , heightGraph - margin.top - margin.bottom)
     .attr("width" , widthGraph - margin.left - margin.right)
     .attr("viewBox", [0, 0, widthGraph, heightGraph]);
 
-  const xAxis = d3.scaleBand()
-    .domain(d3.range(deathsPerAge.length))
+  const xScale = d3.scaleBand()
+    .domain(d3.range(perAgeData.length))
     .range([margin.left, widthGraph - margin.right])
     .padding(0.1);
   
   
-  const yAxis = d3.scaleLinear()
-    .domain(0,max)
-    .range([heightGraph-margin.bottom-margin.top]);
+  const yScale = d3.scaleLinear()
+    .domain([0,max])
+    .range([heightGraph-margin.bottom, margin.top]);
+
+
+  
+  let tool_tip = d3.tip()
+    .attr("class", "d3-tip")
+    .offset([-8, 0])
+    .html(function(d) { return "Radius: "; });
+
+  svgGraph.call(tool_tip);
 
   svgGraph
     .append("g")
     .attr("fill" , "royalblue")
     .selectAll("rect")
-    .data(deathsPerAge.sort((a,b) => d3.descending(a.age_group, b.deaths)))
-    .join("rect")
-      .attr("x", (d,i) => xAxis(i))
-      .attr("y", (d) => yAxis(d.deaths))
-      .attr("height", d => yAxis(0) - yAxis(d.deaths))
-      .attr("width", xAxis.bandwidth());
+    .data(perAgeData)
+    .enter().append("rect") //.join("rect")
+      .attr("x", (d,i) => xScale(i))
+      .attr("y", (d) => yScale(d.allToDate))
+      .attr("height", d => yScale(0) - yScale(d.allToDate))
+      .attr("width", xScale.bandwidth())
+      .attr("class", "rectangle")
+      .on("mouseover", tool_tip.show)
+      .on("mouseout", tool_tip.hide);
+
+  //attempt at tooltip ??
+  svgGraph
+    .append("g")
+    .attr("fill" , "red")
+    .selectAll("rect")
+    .data(perAgeData)
+    .join("rect") //.join("rect")
+      .attr("x", (d,i) => xScale(i))
+      .attr("y", (d) => yScale(d.allToDate))
+      .attr("height", 10)
+      .attr("width", 10)
+      .attr("class", "tooltip")
+      .attr("id", "tooltip 1");
   
+
+  svgGraph
+    .append("g").attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
+    .call(d3.axisBottom(xScale).tickFormat(i => allToDate[i].ageGroup));
+
+  svgGraph
+    .append("g")
+    .attr("transform", `translate(${margin.left}, 0)`)
+    .call(d3.axisLeft(yScale).ticks(null, allToDate.allToDate))
+  
+
   svg.node();
 
 };
-
-render(stats);
 
 
 

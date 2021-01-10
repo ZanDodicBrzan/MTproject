@@ -40,7 +40,7 @@ const DisplayCurrent = async() => {
 
 DisplayCurrent();
 
-//---------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
 const getBetweenDates = async (from, to) => {
   podatkiObcinZaEnMesec = getData(`https://api.sledilnik.org/api/municipalities?from=${from}&to=${to}`);
@@ -58,7 +58,7 @@ const obcineFromTo = async (obcina) => {
       arrayRegij.forEach(regija => {
         //obcine = Object.assign(obcine, regija);
         Object.entries(regija).forEach(([imeObcine, podatki]) => {
-            // map za podatke občin in min in max kativnih primerov
+            // map za podatke občin in min in max aktivnih primerov
             var podatek = podatki.activeCases;
             obcine.set(imeObcine, podatek);
             if (podatki.activeCases > max ) max = podatki.activeCases;
@@ -75,20 +75,7 @@ const obcineFromTo = async (obcina) => {
               
               if(podatki.deceasedToDate==undefined) document.getElementById("deaths").innerHTML = "0";
               else document.getElementById("deaths").innerHTML = podatki.deceasedToDate;
-            }
-            //ni izbrane občine -> prikazujemo skupne podatke za slovenijo
-            if(obcina == "none"){
-              
-              if(statsi[0].cases.active==undefined) document.getElementById("active").innerHTML = "0";
-              else document.getElementById("active").innerHTML = statsi[0].cases.active;
-  
-              if(statsi[0].positiveTests==undefined) document.getElementById("confirmed").innerHTML = "0";
-              else document.getElementById("confirmed").innerHTML = statsi[0].positiveTests;
-              
-              if(statsi[0].statePerTreatment.deceased==undefined) document.getElementById("deaths").innerHTML = "0";
-              else document.getElementById("deaths").innerHTML = statsi[0].statePerTreatment.deceased;
-  
-            }
+            }    
           })
       })
   })
@@ -213,16 +200,23 @@ let datumDo = document.getElementById("dateTo");
 datum.addEventListener('change' , async(event) =>{  
   from = document.getElementById("dateFrom").value || today;
   to = document.getElementById("dateTo").value || today;
+  getBetweenDates(from, to);
   obcineFromTo("none");
+  update(globalGeoJson);
   render();  
 });
 
 datumDo.addEventListener('change' , async(event) =>{  
   from = document.getElementById("dateFrom").value || today;
   to = document.getElementById("dateTo").value || today;
+  getBetweenDates(from, to);
   obcineFromTo("none");
+  update(globalGeoJson);
   render();  
 });
+
+
+// =============================================================================
 
 var tip = d3.select(".chart-container")
 	.append("div")
@@ -291,8 +285,6 @@ var g = svg.append("g")
 
 
 const render = async(x) => {
-  stats = await getData(`https://api.sledilnik.org/api/Stats?from=${from}&to=${to}`);
-  //obcineFromTo(from,to,"none");
 
   deathsPerAge = [];
   

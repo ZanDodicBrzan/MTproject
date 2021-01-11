@@ -291,20 +291,20 @@ const render = async() => {
   let maxRegions = 0;
 
   let perRegion =[];
-  perRegion.push({name:"Celje" , infected:regions.ce});
+  perRegion.push({name:"Savinjska" , infected:regions.ce});
   perRegion.push({name:"Tujina" , infected:regions.foreign});
-  perRegion.push({name:"Krško", infected:regions.kk});
-  perRegion.push({name:"Koper" , infected:regions.kp});
-  perRegion.push({name:"Kranj" , infected:regions.kr});
-  perRegion.push({name:"Ljubljana" , infected:regions.lj});
-  perRegion.push({name:"Maribor" , infected:regions.mb});
-  perRegion.push({name:"Murska Sobota" , infected:regions.ms});
-  perRegion.push({name:"Nova Gorica" , infected:regions.ng});
-  perRegion.push({name:"Novo mesto" , infected:regions.nm});
-  perRegion.push({name:"Postojna" , infected:regions.po});
-  perRegion.push({name:"Slovenj Gradec" , infected:regions.sg});
+  perRegion.push({name:"Posavska", infected:regions.kk});
+  perRegion.push({name:"Obalno-kraška" , infected:regions.kp});
+  perRegion.push({name:"Gorenjska" , infected:regions.kr});
+  perRegion.push({name:"Osrednjeslovenska" , infected:regions.lj});
+  perRegion.push({name:"Podravska" , infected:regions.mb});
+  perRegion.push({name:"Pomurska" , infected:regions.ms});
+  perRegion.push({name:"Goriška" , infected:regions.ng});
+  perRegion.push({name:"Jugovzhodna" , infected:regions.nm});
+  perRegion.push({name:"Primorsko-notranjska" , infected:regions.po});
+  perRegion.push({name:"Koroška" , infected:regions.sg});
   perRegion.push({name:"Neznano" , infected:regions.unknown});
-  perRegion.push({name:"Zasavje" , infected:regions.za});
+  perRegion.push({name:"Zasavska" , infected:regions.za});
   
   for(let regija in perRegion){
     if(perRegion[regija].infected > maxRegions) maxRegions = perRegion[regija].infected;

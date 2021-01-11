@@ -356,7 +356,7 @@ const render = async() => {
               .style("opacity", 0.9)
               .style("left", d.pageX +"px")		
               .style("top", d.pageY +"px");
-        Tooltip.html(i.allToDate);
+        Tooltip.html("Število okužb: " + i.allToDate);
       })
       .on("mousemove", function(d,i){
         Tooltip

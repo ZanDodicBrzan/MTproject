@@ -311,9 +311,9 @@ const render = async() => {
   }
 
   //1. graf
-  const widthGraph = 1000;
-  const heightGraph = 500;
-  const margin = {top:50, bottom:50, left:50, right:50};
+  let widthGraph = 1000;
+  let heightGraph = 500;
+  let margin = {top:50, bottom:50, left:50, right:50};
 
   const svgGraph = d3.select("#graphContainer")
     .attr("height" , heightGraph - margin.top - margin.bottom)
@@ -413,6 +413,9 @@ const render = async() => {
   
     //___________________________________2.graf
 
+    widthGraph = 1000;
+    heightGraph = 500;
+    margin = {top:50, bottom:100, left:50, right:50};
 
   const svgGraph2 = d3.select("#graphContainer2")
     .attr("height" , heightGraph - margin.top - margin.bottom)
@@ -426,7 +429,7 @@ const render = async() => {
   
   
   yScale = d3.scaleLinear()
-    .domain([0,max])
+    .domain([0,maxRegions])
     .range([heightGraph-margin.bottom, margin.top]);
 
   
@@ -457,7 +460,7 @@ const render = async() => {
               .style("left", d.pageX +"px")		
               .style("top", d.pageY +"px");
         Tooltip
-          .html("Regija: " + i.name + "<br>" + "Število okužb:" + i.infected)
+          .html("Regija: " + i.name + "<br>" + "Število okužb: " + i.infected)
       })
       .on("mousemove", function(d,i){
         Tooltip
@@ -470,20 +473,28 @@ const render = async() => {
       })
 
 
-
-      console.log(regions);
+  //x axis
   svgGraph2
-    .append("g").attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
+    .append("g")
+    .attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
     .call(d3.axisBottom(xScale).tickFormat(i => perRegion[i].name))
-    .attr("font-size", "18px");
+    .selectAll("text")
+    .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-25)")
+    .attr("font-size", "15px")
+    
 
+  //y axis
   svgGraph2
     .append("g")
     .attr("transform", `translate(${margin.left}, 0)`)
     .call(d3.axisLeft(yScale).ticks(null, perRegion.infected))
     .attr("font-size", "18px")
+    
   
-    //naslov
+  //naslov
   svgGraph2
     .append("text")
     .attr("x", (widthGraph/2))

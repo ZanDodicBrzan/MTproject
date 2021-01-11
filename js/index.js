@@ -399,13 +399,22 @@ const render = async() => {
 
   svgGraph
     .append("g").attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
-    .call(d3.axisBottom(xScale).tickFormat(i => allToDate[i].ageGroup));
+    .call(d3.axisBottom(xScale).tickFormat(i => allToDate[i].ageGroup))
+    .attr("font-size", "18px");
 
   svgGraph
     .append("g")
     .attr("transform", `translate(${margin.left}, 0)`)
     .call(d3.axisLeft(yScale).ticks(null, allToDate.allToDate))
+    .attr("font-size", "18px")
   
+  svgGraph
+    .append("text")
+    .attr("x", (widthGraph/2))
+    .attr("y", 0-(margin.top/2))
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px") 
+    .text("grafek");
 
   svg.node();
 

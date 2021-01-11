@@ -6,6 +6,7 @@ var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
 today = mm + '-' + dd + '-' + yyyy;
+todayF = dd + '.' + mm + '.' + yyyy;
 
 let stats;
 let summary;
@@ -18,6 +19,9 @@ var min = 999999999;
 var max = 0;
 var globalGeoJson;
 let podatkiObcinZaEnMesec;
+var clicked = [];
+
+document.getElementById("datum").innerHTML = todayF;
 
 // --------------------------------------------------------------------------
 
@@ -153,6 +157,7 @@ function handleMouseout(d) {
 // onClick --------------------------------------------------------------------
 function onClick(e, d) {
   const imeObcine = d.properties.name.replace(/\s+/g, '_').toLowerCase();
+  console.log(imeObcine);
   if (!clicked.includes(imeObcine)) {
     clicked.push(imeObcine)
     d3.select(this)
@@ -165,7 +170,7 @@ function onClick(e, d) {
     d3.select(this)
       .transition()
       .duration('50')
-      .style("fill", d3.interpolateBlues(1-parseInt(obcina)/1001));
+      .style("fill", d3.interpolateBlues(parseInt(obcina)/250));
   }
 }
 

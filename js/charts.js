@@ -131,4 +131,55 @@ const chartOptions = {
       },
       options: chartOptions
   });
+
+  var ctx = document.getElementById('chart7').getContext('2d');
+  var chart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: [2, 5, 1, 3, 2, 6, 7],
+          datasets: [
+              {
+                  backgroundColor: "rgba(107, 0, 0, 0.05)",
+                  borderColor: "rgba(107, 0, 0, 0.8)",
+                  borderWidth: 2,
+                  data: [1.8, 3, 2, 2.5, 2.2, 2.5, 3],
+              },
+          ],
+      },
+      options: chartOptions
+  });
+
+  var ctx = document.getElementById('chart8').getContext('2d');
+  var chart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: [2, 5, 1, 3, 2, 6, 7],
+          datasets: [
+              {
+                  backgroundColor: "rgba(255, 0, 0, 0.2)",
+                  borderColor: "rgba(255, 0, 0, 0.02)",
+                  borderWidth: 2,
+                  data: [10, 10, 10, 10, 10, 10, 10],
+              },
+          ],
+      },
+      options: chartOptions
+  });
+
+  var ctx = document.getElementById('chart9').getContext('2d');
+  var chart = new Chart(ctx, {
+      type: "line",
+      data: {
+          labels: [2, 5, 1, 3, 2, 6, 7],
+          datasets: [
+              {
+                  backgroundColor: "rgba(59, 59, 59, 0.05)",
+                  borderColor: "rgba(59, 59, 59, 0.8)",
+                  borderWidth: 2,
+                  data: [0, 0.6, 1, 1.2, 1.6, 2, 2.7],
+              },
+          ],
+      },
+      options: chartOptions
+  });
   

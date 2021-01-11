@@ -83,7 +83,7 @@
       <div class="container">
         <header class="section-header">
           <h3><b>Najnovejši Podatki</b></h3>
-          <p>Podatki prikazujejo prejšnji dan.</p>
+          <p><span style="font-size: 20px; color: rgb(90, 90, 90)" id="datum"></span></p>
         </header>
 
         <div class="row counters">
@@ -137,7 +137,7 @@
                 <p class="card-text" id="confirmed">0</p>
                 <h5 class="card-title">Umrli:</h5>
                 <p class="card-text" id="deaths">0</p>
-                <a href="#" class="readmore">Podrobneje </a>
+                <!--<a href="#" class="readmore">Podrobneje </a>-->
               </div>
             </div>
           </div>
@@ -181,9 +181,8 @@
       <div class="container">
 
         <header class="section-header">
-          <h3>Statistika</h3>
-          
-          <p>Razne zanimivosti in statistike. <br><b><span style="font-size: 25px;" id="datum"></span></b></p>
+          <h3>Statistika</h3> 
+          <p><b><span style="font-size: 25px;" id="datum"></span></b></p>
         </header>
 
         <div class="row row-eq-height justify-content-center">
@@ -191,7 +190,7 @@
           <div class="col-lg-4 mb-4">
             <div class="card wow bounceInUp">
               <div class="card-body text-center">
-                <h5 class="card-title"><b>Testi HAT (hitri)</b>:</h5>
+                <h5 class="card-title"><b>Testi HAT (hitri)</b></h5>
                 <p class="card-title"><sup>Danes</sup></p>
                 <b><span style="font-size: 30px" data-toggle="counter-up" id="tests-hat"></span></b><br>
                 <br><a class="textZ" href="https://medium.com/sledilnik/hitri-testi-ef102c5b181a" class="readmore">Več o HAT </a>
@@ -205,7 +204,7 @@
           <div class="col-lg-4 mb-4">
             <div class="card wow bounceInUp">
               <div class="card-body text-center">
-                <h5 class="card-title"><b>Testi PCR:</b></h5>
+                <h5 class="card-title"><b>Testi PCR</b></h5>
                 <p class="card-title"><sup>Danes</sup></p>
                 <b><span style="font-size: 30px" data-toggle="counter-up" id="tests-pcr"></span><br></b>
                 <br><a class="textZ" href="https://medium.com/sledilnik/pcr-testi-so-zanesljivi-9354a92c9c18" class="readmore">Več o PCR </a>
@@ -219,7 +218,7 @@
           <div class="col-lg-4 mb-4">
             <div class="card wow bounceInUp">
               <div class="card-body text-center">
-                <h5 class="card-title"><b>Cepljeni do danes:</b></h5>
+                <h5 class="card-title"><b>Cepljeni do danes</b></h5>
                 <p class="card-title"><sup>Skupaj</sup></p>
                 <b><span style="font-size: 30px" data-toggle="counter-up" id="vaccinated"></span><br></b>
                 <br><a class="textZ" href="https://www.nijz.si/sl/cepljenje-covid" class="readmore">Več o cepljenju</a>
@@ -233,7 +232,7 @@
           <div class="col-lg-4 mb-4">
             <div class="card wow bounceInUp">
               <div class="card-body text-center">
-                <h5 class="card-title"><b>Hospitalizirani:</b></h5>
+                <h5 class="card-title"><b>Hospitalizirani</b></h5>
                 <p class="card-title"><sup>Skupaj</sup></p>
                 <b><span style="font-size: 30px" data-toggle="counter-up" id="hospital"></span><br></b>
                 <br><a class="textZ" href="https://www.gov.si/teme/koronavirus-sars-cov-2/aktualni-podatki/" class="readmore">Vir</a>
@@ -247,7 +246,7 @@
           <div class="col-lg-4 mb-4">
             <div class="card wow bounceInUp">
               <div class="card-body text-center">
-                <h5 class="card-title"><b>Na intenzivni negi:</b></h5>
+                <h5 class="card-title"><b>Na intenzivni negi</b></h5>
                 <p class="card-title"><sup>Skupaj</sup></p>
                 <b><span style="font-size: 30px" data-toggle="counter-up" id="intense"></span><br></b>
                 <br><a class="textZ" href="https://www.gov.si/teme/koronavirus-sars-cov-2/aktualni-podatki/" class="readmore">Vir</a>
@@ -261,13 +260,55 @@
           <div class="col-lg-4 mb-4">
             <div class="card wow bounceInUp">
               <div class="card-body text-center">
-                <h5 class="card-title"><b>Odpuščenih iz bolnišnice:</b></h5>
+                <h5 class="card-title"><b>Odpuščenih iz bolnišnice</b></h5>
                 <p class="card-title"><sup>Danes</sup></p>
                 <b><span style="font-size: 30px" data-toggle="counter-up" id="goodOut"></span><br></b>
                 <br><a class="textZ" href="https://www.gov.si/teme/koronavirus-sars-cov-2/aktualni-podatki/" class="readmore">Vir</a>
               </div>
               <div class="chartZ position-absolute bottom-0">
                 <canvas id="chart6" height="70"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 mb-4">
+            <div class="card wow bounceInUp">
+              <div class="card-body text-center">
+                <h5 class="card-title"><b>7-Dnevno povprečje okužb</b></h5>
+                <p class="card-title"><sup>Povprečje</sup></p>
+                <b><span style="font-size: 30px" data-toggle="counter-up" id="avg7"></span><br></b>
+                <br><a class="textZ" href="https://www.gov.si/teme/koronavirus-sars-cov-2/aktualni-podatki/" class="readmore">Vir</a>
+              </div>
+              <div class="chartZ position-absolute bottom-0">
+                <canvas id="chart7" height="70"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 mb-4">
+            <div class="card wow bounceInUp">
+              <div class="card-body text-center">
+                <h5 class="card-title"><b>Meja rdeče faze</b></h5>
+                <p class="card-title"><sup>Okužb</sup></p>
+                <b style="font-size: 30px"><1350</b><br>
+                <br><a class="textZ" href="https://www.delo.si/novice/slovenija/prvaki-koalicijskih-strank-o-prioritetah-v-boju-z-epidemijo" class="readmore">Vir</a>
+              </div>
+              <div class="chartZ position-absolute bottom-0">
+                <canvas id="chart8" height="70"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 mb-4">
+            <div class="card wow bounceInUp">
+              <div class="card-body text-center">
+                <h5 class="card-title"><b>Umrli</b></h5>
+                <p class="card-title"><sup>Skupaj</sup></p>
+                <b><span style="font-size: 30px" data-toggle="counter-up" id="dead"></span><br></b>
+                <br><a class="textZ" href="https://www.gov.si/teme/koronavirus-sars-cov-2/aktualni-podatki/" class="readmore">Vir</a>
+              </div>
+              <div class="chartZ position-absolute bottom-0">
+                <canvas id="chart9" height="70"></canvas>
               </div>
             </div>
           </div>

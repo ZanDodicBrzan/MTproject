@@ -1,7 +1,7 @@
 //spremenljivke
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-2).padStart(2, '0');
+var dd = String(today.getDate()-1).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
@@ -40,6 +40,8 @@ const DisplayCurrent = async() => {
   document.getElementById("hospital").innerHTML = summary.hospitalizedCurrent.value;
   document.getElementById("intense").innerHTML = summary.icuCurrent.value;
   document.getElementById("goodOut").innerHTML = summary.hospitalizedCurrent.subValues.out;
+  document.getElementById("avg7").innerHTML = (summary.casesAvg7Days.value).toFixed(2);
+  document.getElementById("dead").innerHTML = summary.deceasedToDate.value;
 
   render();
 };

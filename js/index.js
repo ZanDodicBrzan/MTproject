@@ -293,29 +293,29 @@ const render = async() => {
   let maxRegions = 0;
 
   let perRegion =[];
-  perRegion.push({name:"Celje" , infected:regions.ce});
+  perRegion.push({name:"Savinjska" , infected:regions.ce});
   perRegion.push({name:"Tujina" , infected:regions.foreign});
-  perRegion.push({name:"Krško", infected:regions.kk});
-  perRegion.push({name:"Koper" , infected:regions.kp});
-  perRegion.push({name:"Kranj" , infected:regions.kr});
-  perRegion.push({name:"Ljubljana" , infected:regions.lj});
-  perRegion.push({name:"Maribor" , infected:regions.mb});
-  perRegion.push({name:"Murska Sobota" , infected:regions.ms});
-  perRegion.push({name:"Nova Gorica" , infected:regions.ng});
-  perRegion.push({name:"Novo mesto" , infected:regions.nm});
-  perRegion.push({name:"Postojna" , infected:regions.po});
-  perRegion.push({name:"Slovenj Gradec" , infected:regions.sg});
+  perRegion.push({name:"Posavska", infected:regions.kk});
+  perRegion.push({name:"Obalno-kraška" , infected:regions.kp});
+  perRegion.push({name:"Gorenjska" , infected:regions.kr});
+  perRegion.push({name:"Osrednjeslovenska" , infected:regions.lj});
+  perRegion.push({name:"Podravska" , infected:regions.mb});
+  perRegion.push({name:"Pomurska" , infected:regions.ms});
+  perRegion.push({name:"Goriška" , infected:regions.ng});
+  perRegion.push({name:"Jugovzhodna" , infected:regions.nm});
+  perRegion.push({name:"Primorsko-notranjska" , infected:regions.po});
+  perRegion.push({name:"Koroška" , infected:regions.sg});
   perRegion.push({name:"Neznano" , infected:regions.unknown});
-  perRegion.push({name:"Zasavje" , infected:regions.za});
+  perRegion.push({name:"Zasavska" , infected:regions.za});
   
   for(let regija in perRegion){
     if(perRegion[regija].infected > maxRegions) maxRegions = perRegion[regija].infected;
   }
 
   //1. graf
-  const widthGraph = 1000;
-  const heightGraph = 500;
-  const margin = {top:50, bottom:50, left:50, right:50};
+  let widthGraph = 1000;
+  let heightGraph = 500;
+  let margin = {top:50, bottom:50, left:50, right:50};
 
   const svgGraph = d3.select("#graphContainer")
     .attr("height" , heightGraph - margin.top - margin.bottom)
@@ -358,7 +358,7 @@ const render = async() => {
               .style("opacity", 0.9)
               .style("left", d.pageX +"px")		
               .style("top", d.pageY +"px");
-        Tooltip.html(i.allToDate);
+        Tooltip.html("Število okužb: " + i.allToDate);
       })
       .on("mousemove", function(d,i){
         Tooltip
@@ -415,6 +415,9 @@ const render = async() => {
   
     //___________________________________2.graf
 
+    widthGraph = 1000;
+    heightGraph = 500;
+    margin = {top:50, bottom:100, left:50, right:50};
 
   const svgGraph2 = d3.select("#graphContainer2")
     .attr("height" , heightGraph - margin.top - margin.bottom)
@@ -428,7 +431,7 @@ const render = async() => {
   
   
   yScale = d3.scaleLinear()
-    .domain([0,max])
+    .domain([0,maxRegions])
     .range([heightGraph-margin.bottom, margin.top]);
 
   
@@ -459,7 +462,7 @@ const render = async() => {
               .style("left", d.pageX +"px")		
               .style("top", d.pageY +"px");
         Tooltip
-          .html("Regija: " + i.name + "<br>" + "Število okužb:" + i.infected)
+          .html("Regija: " + i.name + "<br>" + "Število okužb: " + i.infected)
       })
       .on("mousemove", function(d,i){
         Tooltip
@@ -472,20 +475,28 @@ const render = async() => {
       })
 
 
-
-      console.log(regions);
+  //x axis
   svgGraph2
-    .append("g").attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
+    .append("g")
+    .attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
     .call(d3.axisBottom(xScale).tickFormat(i => perRegion[i].name))
-    .attr("font-size", "18px");
+    .selectAll("text")
+    .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-25)")
+    .attr("font-size", "15px")
+    
 
+  //y axis
   svgGraph2
     .append("g")
     .attr("transform", `translate(${margin.left}, 0)`)
     .call(d3.axisLeft(yScale).ticks(null, perRegion.infected))
     .attr("font-size", "18px")
+    
   
-    //naslov
+  //naslov
   svgGraph2
     .append("text")
     .attr("x", (widthGraph/2))

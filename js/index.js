@@ -1,7 +1,7 @@
 //spremenljivke
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-1).padStart(2, '0');
+var dd = String(today.getDate()-2).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
@@ -314,8 +314,8 @@ const render = async() => {
     allToDate.push({ageGroup:ageGroup, allToDate: perAgeData[i].allToDate});
     
   }
-  console.log(perAgeData);
-  console.log(allToDate);
+  //console.log(perAgeData);
+  //console.log(allToDate);
 
   const widthGraph = 800;
   const heightGraph = 400;
@@ -336,14 +336,36 @@ const render = async() => {
     .domain([0,max])
     .range([heightGraph-margin.bottom, margin.top]);
 
+  var Tooltip = d3.select("#graphDiv")
+      .append("div")
+      .style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
 
-  
-  let tool_tip = d3.tip()
-    .attr("class", "d3-tip")
-    .offset([-8, 0])
-    .html(function(d) { return "Radius: "; });
-
-  svgGraph.call(tool_tip);
+  var mouseover = function(d) {
+    Tooltip
+      .style("opacity", 1)
+    d3.select(this)
+      .style("stroke", "black")
+      .style("opacity", 1)
+  }
+  var mousemove = function(d) {
+    Tooltip
+      .html("The exact value of<br>this cell is: " )
+      .style("left", (d3.mouse(this)[0]+70) + "px")
+      .style("top", (d3.mouse(this)[1]) + "px")
+  }
+  var mouseleave = function(d) {
+    Tooltip
+      .style("opacity", 0)
+    d3.select(this)
+      .style("stroke", "none")
+      .style("opacity", 0.8)
+  }
 
   svgGraph
     .append("g")
@@ -356,23 +378,20 @@ const render = async() => {
       .attr("height", d => yScale(0) - yScale(d.allToDate))
       .attr("width", xScale.bandwidth())
       .attr("class", "rectangle")
-      .on("mouseover", tool_tip.show)
-      .on("mouseout", tool_tip.hide);
+      .on("mouseover", function(d, i) {
+        Tooltip
+              .style("opacity", 0.9)
+              .style("left", d.x)		
+              .style("top", d.y);
+        Tooltip.html(i.allToDate)
+        
+      })
+      
+      .on("mouseout", function(d){
+        Tooltip.style("opacity", 0)
+      })
 
-  //attempt at tooltip ??
-  svgGraph
-    .append("g")
-    .attr("fill" , "red")
-    .selectAll("rect")
-    .data(perAgeData)
-    .join("rect") //.join("rect")
-      .attr("x", (d,i) => xScale(i))
-      .attr("y", (d) => yScale(d.allToDate))
-      .attr("height", 10)
-      .attr("width", 10)
-      .attr("class", "tooltip")
-      .attr("id", "tooltip 1");
-  
+
 
   svgGraph
     .append("g").attr("transform", `translate(0, ${heightGraph-margin.bottom})`)

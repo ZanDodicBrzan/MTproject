@@ -381,10 +381,14 @@ const render = async() => {
       .on("mouseover", function(d, i) {
         Tooltip
               .style("opacity", 0.9)
-              .style("left", d.x)		
-              .style("top", d.y);
-        Tooltip.html(i.allToDate)
-        
+              .style("left", d.pageX +"px")		
+              .style("top", d.pageY +"px");
+        Tooltip.html(i.allToDate);
+      })
+      .on("mousemove", function(d,i){
+        Tooltip
+          .style("left", d.pageX+5 +"px")		
+          .style("top", d.pageY-25 +"px");
       })
       
       .on("mouseout", function(d){

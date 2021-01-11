@@ -89,7 +89,7 @@ const chartOptions = {
           datasets: [
               {
                   backgroundColor: "rgba(255, 12, 7, 0.05)",
-                  borderColor: "rgba(255, 12, 7, 0.8)",
+                  borderColor: "rgba(255, 12, 7, 0.6)",
                   borderWidth: 2,
                   data: [2, 2.3, 1, 3, 2, 4, 3.3],
               },

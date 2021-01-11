@@ -5,11 +5,19 @@ var dd = String(today.getDate()-1).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
+
 today = mm + '-' + dd + '-' + yyyy;
 todayF = dd + '.' + mm + '.' + yyyy;
+mm--
+if(mm <= 0) {
+  mm = 12;
+  yyyy = yyyy-1;
+}
+let monthAgo = mm + "-" + dd + "-" + yyyy; 
 
 let stats;
 let summary;
+let statsMonth;
 let from = today;
 let to = today;
 let deathsPerAge;
@@ -29,6 +37,7 @@ document.getElementById("datum").innerHTML = todayF;
 const DisplayCurrent = async() => {
   stats= await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
   summary = await getData(`https://api.sledilnik.org/api/summary?toDate=${today}`);
+  statsMonth = await getData(`https://api.sledilnik.org/api/Stats?from=${monthAgo}&to=${today}`);
 
   document.getElementById("deceased-today").innerHTML = stats[0].statePerTreatment.deceased;
   document.getElementById("active-today").innerHTML = stats[0].cases.active;
@@ -294,7 +303,6 @@ const render = async() => {
 
   let perRegion =[];
   perRegion.push({name:"Savinjska" , infected:regions.ce});
-  perRegion.push({name:"Tujina" , infected:regions.foreign});
   perRegion.push({name:"Posavska", infected:regions.kk});
   perRegion.push({name:"Obalno-kraška" , infected:regions.kp});
   perRegion.push({name:"Gorenjska" , infected:regions.kr});
@@ -305,14 +313,13 @@ const render = async() => {
   perRegion.push({name:"Jugovzhodna" , infected:regions.nm});
   perRegion.push({name:"Primorsko-notranjska" , infected:regions.po});
   perRegion.push({name:"Koroška" , infected:regions.sg});
-  perRegion.push({name:"Neznano" , infected:regions.unknown});
   perRegion.push({name:"Zasavska" , infected:regions.za});
   
   for(let regija in perRegion){
     if(perRegion[regija].infected > maxRegions) maxRegions = perRegion[regija].infected;
   }
 
-  //1. graf
+  //_______________________________________________1. graf
   let widthGraph = 1000;
   let heightGraph = 500;
   let margin = {top:50, bottom:50, left:50, right:50};
@@ -417,24 +424,26 @@ const render = async() => {
 
     widthGraph = 1000;
     heightGraph = 500;
-    margin = {top:50, bottom:100, left:50, right:50};
+    margin = {top:50, bottom:100, left:50, right:10};
 
+  //definiraj svg za graf
   const svgGraph2 = d3.select("#graphContainer2")
     .attr("height" , heightGraph - margin.top - margin.bottom)
     .attr("width" , widthGraph - margin.left - margin.right)
     .attr("viewBox", [0, 0, widthGraph, heightGraph]);
 
+  // skaliranje za x os  
   xScale = d3.scaleBand()
     .domain(d3.range(perRegion.length))
     .range([margin.left, widthGraph - margin.right])
     .padding(0.1);
   
-  
+  // skaliranje za y os
   yScale = d3.scaleLinear()
     .domain([0,maxRegions])
     .range([heightGraph-margin.bottom, margin.top]);
 
-  
+  //Ustvarjanje tooltip - prikaže se na mouseover
   var Tooltip = d3.select("#graphDiv")
       .append("div")
       .style("opacity", 0)
@@ -445,6 +454,7 @@ const render = async() => {
       .style("border-radius", "5px")
       .style("padding", "5px")
 
+  //dodajanje bars na svg
   svgGraph2
     .append("g")
     .attr("fill" , "royalblue")
@@ -527,6 +537,143 @@ const render = async() => {
     .text("Število okužb")
     .style("fill", "Black"); 
   
+
+
+//____________________3.graf
+let statsPerDay = [];
+let maxStatsPerDay = 0;
+
+widthGraph = 1000;
+heightGraph = 800;
+margin = {top:50, bottom:100, left:50, right:50};
+
+for(let dan in statsMonth){
+  let tempdate = statsMonth[dan].year + "-" + statsMonth[dan].month + "-" +  statsMonth[dan].day;
+  //console.log(tempdate);
+  //console.log(Date.parse(tempdate));
+  statsPerDay.push({day: tempdate, positiveTests: statsMonth[dan].positiveTests});
+  if(statsMonth[dan].positiveTests > maxStatsPerDay) maxStatsPerDay = statsMonth[dan].positiveTests; 
+}
+console.log(statsPerDay);
+
+const svgGraph3 = d3.select("#graphContainer3")
+    .attr("height" , heightGraph - margin.top - margin.bottom)
+    .attr("width" , widthGraph - margin.left - margin.right)
+    .attr("viewBox", [0, 0, widthGraph, heightGraph]);
+/*
+  // skaliranje za x os
+  xScale = d3.scaleLinear()
+    .domain(d3.range(statsPerDay.length))
+    .range([margin.left, widthGraph - margin.right]);
+*/
+  xScale = d3.scaleLinear()
+    .domain([0, statsPerDay.length])
+    .range([0, widthGraph]);
+  
+  // skaliranje za y os
+  yScale = d3.scaleLinear()
+    .domain([0,maxStatsPerDay])
+    .range([heightGraph-margin.bottom, margin.top]);
+
+  //line generator
+  let line = d3.line()
+    .x(function(d,i) { return xScale(i);})
+    .y(function(d) {return yScale(d.positiveTests)})
+    .curve(d3.curveMonotoneX);
+  
+  //x axis
+  svgGraph3
+    .append("g")
+    .attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
+    .call(d3.axisBottom(xScale).tickFormat(i => statsPerDay[i].day))
+    .selectAll("text")
+    .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)")
+    .attr("font-size", "15px")
+
+  //y axis  
+  svgGraph3
+    .append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(yScale));
+  
+  //graf
+  svgGraph3
+    .append("path")
+    .datum(statsPerDay)
+    .attr("class", "line")
+    .attr("d", line)
+    .style("fill", "none")
+    .style("stroke-width", "1.5px")
+    .style("stroke", "royalblue");
+
+  svgGraph3.selectAll(".dot")
+    .data(statsPerDay)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("cx", function(d, i){ return xScale(i)})
+      .attr("cy", function(d){ return yScale(d.positiveTests)})
+      .attr("r", 8)
+      .on("mouseover", function(d, i) {
+        Tooltip
+              .style("opacity", 0.9)
+              .style("left", d.pageX +"px")		
+              .style("top", d.pageY +"px");
+        Tooltip
+          .html("Datum " + i.day + "<br>" + "Število potrjenih testov: " + i.positiveTests)
+        d3.select(this)
+        .transition()
+        .duration(300)
+        .attr('opacity', 0.6)
+        .attr("r", 15)
+      })
+      .on("mousemove", function(d,i){
+        Tooltip
+          .style("left", d.pageX+5 +"px")		
+          .style("top", d.pageY-50 +"px");
+      })
+      
+      .on("mouseout", function(d){
+        Tooltip.style("opacity", 0);
+        d3.select(this)
+        .transition()
+        .duration(300)
+        .attr('opacity', 1)
+        .attr("r", 8)
+      })
+
+    //naslov
+  svgGraph3
+    .append("text")
+    .attr("x", (widthGraph/2))
+    .attr("y", 10)
+    .attr("text-anchor", "middle")
+    .style("font-size", "25px") 
+    .text("Število pozitivnih testov - zadnji mesec")
+    .style("font-weigh", "bold")
+    .attr("dy", "1em")
+    .style("fill", "black");
+
+  //label x
+  svgGraph3.append("text")             
+    .attr("x", (widthGraph/2))
+    .attr("y", heightGraph-10)
+    .style("text-anchor", "middle")
+    .style("fill", "Black")
+    .style("font-style", "italic")
+    .text("Datum");
+  //label y
+  svgGraph3.append("text")
+    //.attr("transform", "rotate(-90)")
+    .attr("x", 10+ margin.left)
+    .attr("y", 10)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .style("font-style", "italic")
+    .text("Število pozitivnih testov")
+    .style("fill", "Black"); 
 };
 
 

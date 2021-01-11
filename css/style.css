@@ -1470,3 +1470,8 @@ h6 {
 #graphDiv{
   text-align:center;
 }
+
+.dot {
+  fill: #ffab00;
+  stroke: #fff;
+}

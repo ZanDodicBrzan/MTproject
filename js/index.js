@@ -354,8 +354,8 @@ const render = async() => {
   //console.log(perAgeData);
   //console.log(allToDate);
 
-  const widthGraph = 800;
-  const heightGraph = 400;
+  const widthGraph = 1000;
+  const heightGraph = 500;
   const margin = {top:50, bottom:50, left:50, right:50};
 
   const svgGraph = d3.select("#graphContainer")
@@ -382,27 +382,6 @@ const render = async() => {
       .style("border-width", "2px")
       .style("border-radius", "5px")
       .style("padding", "5px")
-
-  var mouseover = function(d) {
-    Tooltip
-      .style("opacity", 1)
-    d3.select(this)
-      .style("stroke", "black")
-      .style("opacity", 1)
-  }
-  var mousemove = function(d) {
-    Tooltip
-      .html("The exact value of<br>this cell is: " )
-      .style("left", (d3.mouse(this)[0]+70) + "px")
-      .style("top", (d3.mouse(this)[1]) + "px")
-  }
-  var mouseleave = function(d) {
-    Tooltip
-      .style("opacity", 0)
-    d3.select(this)
-      .style("stroke", "none")
-      .style("opacity", 0.8)
-  }
 
   svgGraph
     .append("g")
@@ -453,6 +432,14 @@ const render = async() => {
     .style("font-size", "16px") 
     .text("grafek");
 
+
+  svgGraph.append("text")             
+    .attr("transform",
+          "translate(" + (widthGraph/2) + " ," + 
+                         (heightGraph + margin.top + 20) + ")")
+    .style("text-anchor", "middle")
+    .style("color", "red")
+    .text("Starostna skupina");
   svg.node();
 
 };

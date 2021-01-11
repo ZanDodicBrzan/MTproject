@@ -432,19 +432,33 @@ const render = async() => {
   svgGraph
     .append("text")
     .attr("x", (widthGraph/2))
-    .attr("y", 0-(margin.top/2))
+    .attr("y", 10)
     .attr("text-anchor", "middle")
-    .style("font-size", "16px") 
-    .text("grafek");
+    .style("font-size", "25px") 
+    .text("Skupno število okužb po starostnih skupinah")
+    .style("font-weight", "bold")
+    .attr("dy", "1em")
+    .style("fill", "black");
 
 
   svgGraph.append("text")             
-    .attr("transform",
-          "translate(" + (widthGraph/2) + " ," + 
-                         (heightGraph + margin.top + 20) + ")")
+    .attr("x", (widthGraph/2))
+    .attr("y", heightGraph-10)
     .style("text-anchor", "middle")
-    .style("color", "red")
+    .style("fill", "Black")
+    .style("font-style", "italic")
     .text("Starostna skupina");
+
+  svgGraph.append("text")
+    //.attr("transform", "rotate(-90)")
+    .attr("y", 10)
+    .attr("x", (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .style("font-style", "italic")
+    .text("Število okužb")
+    .style("fill", "Black"); 
+
   svg.node();
 
 };

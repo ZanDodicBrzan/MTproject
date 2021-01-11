@@ -1467,8 +1467,6 @@ h6 {
   fill: royalblue;
 }
 
-#graphContainer{
-  margin: 0 auto;
-  
-  
+#graphDiv{
+  text-align:center;
 }

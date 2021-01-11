@@ -265,8 +265,7 @@ datumDo.addEventListener('change' , async(event) =>{
 const render = async() => {
 
   let allToDate = [];
-  let maleToDate = [];
-  let femaleToDate = [];
+  
   
   let perAgeData = await stats[0].statePerAgeToDate;
   let max = 0;
@@ -285,14 +284,33 @@ const render = async() => {
     }
     if(perAgeData[i].allToDate > max) max = perAgeData[i].allToDate;
     
-    //console.log(ageGroup);
-    
     allToDate.push({ageGroup:ageGroup, allToDate: perAgeData[i].allToDate});
-    
   }
-  //console.log(perAgeData);
-  //console.log(allToDate);
 
+  let regions = await stats[0].statePerRegion;
+  let maxRegions = 0;
+
+  let perRegion =[];
+  perRegion.push({name:"Celje" , infected:regions.ce});
+  perRegion.push({name:"Tujina" , infected:regions.foreign});
+  perRegion.push({name:"Krško", infected:regions.kk});
+  perRegion.push({name:"Koper" , infected:regions.kp});
+  perRegion.push({name:"Kranj" , infected:regions.kr});
+  perRegion.push({name:"Ljubljana" , infected:regions.lj});
+  perRegion.push({name:"Maribor" , infected:regions.mb});
+  perRegion.push({name:"Murska Sobota" , infected:regions.ms});
+  perRegion.push({name:"Nova Gorica" , infected:regions.ng});
+  perRegion.push({name:"Novo mesto" , infected:regions.nm});
+  perRegion.push({name:"Postojna" , infected:regions.po});
+  perRegion.push({name:"Slovenj Gradec" , infected:regions.sg});
+  perRegion.push({name:"Neznano" , infected:regions.unknown});
+  perRegion.push({name:"Zasavje" , infected:regions.za});
+  
+  for(let regija in perRegion){
+    if(perRegion[regija].infected > maxRegions) maxRegions = perRegion[regija].infected;
+  }
+
+  //1. graf
   const widthGraph = 1000;
   const heightGraph = 500;
   const margin = {top:50, bottom:50, left:50, right:50};
@@ -302,13 +320,13 @@ const render = async() => {
     .attr("width" , widthGraph - margin.left - margin.right)
     .attr("viewBox", [0, 0, widthGraph, heightGraph]);
 
-  const xScale = d3.scaleBand()
+  let xScale = d3.scaleBand()
     .domain(d3.range(perAgeData.length))
     .range([margin.left, widthGraph - margin.right])
     .padding(0.1);
   
   
-  const yScale = d3.scaleLinear()
+  let yScale = d3.scaleLinear()
     .domain([0,max])
     .range([heightGraph-margin.bottom, margin.top]);
 
@@ -392,6 +410,110 @@ const render = async() => {
     .style("font-style", "italic")
     .text("Število okužb")
     .style("fill", "Black"); 
+  
+    //___________________________________2.graf
+
+
+  const svgGraph2 = d3.select("#graphContainer2")
+    .attr("height" , heightGraph - margin.top - margin.bottom)
+    .attr("width" , widthGraph - margin.left - margin.right)
+    .attr("viewBox", [0, 0, widthGraph, heightGraph]);
+
+  xScale = d3.scaleBand()
+    .domain(d3.range(perRegion.length))
+    .range([margin.left, widthGraph - margin.right])
+    .padding(0.1);
+  
+  
+  yScale = d3.scaleLinear()
+    .domain([0,max])
+    .range([heightGraph-margin.bottom, margin.top]);
+
+  
+  var Tooltip = d3.select("#graphDiv")
+      .append("div")
+      .style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
+
+  svgGraph2
+    .append("g")
+    .attr("fill" , "royalblue")
+    .selectAll("rect")
+    .data(perRegion.sort((a,b) => d3.ascending(a.infected, b.infected)))
+    .enter().append("rect") //.join("rect")
+      .attr("x", (d,i) => xScale(i))
+      .attr("y", (d) => yScale(d.infected))
+      .attr("height", d => yScale(0) - yScale(d.infected))
+      .attr("width", xScale.bandwidth())
+      .attr("class", "rectangle")
+      .on("mouseover", function(d, i) {
+        Tooltip
+              .style("opacity", 0.9)
+              .style("left", d.pageX +"px")		
+              .style("top", d.pageY +"px");
+        Tooltip
+          .html("Regija: " + i.name + "<br>" + "Število okužb:" + i.infected)
+      })
+      .on("mousemove", function(d,i){
+        Tooltip
+          .style("left", d.pageX+5 +"px")		
+          .style("top", d.pageY-50 +"px");
+      })
+      
+      .on("mouseout", function(d){
+        Tooltip.style("opacity", 0)
+      })
+
+
+
+      console.log(regions);
+  svgGraph2
+    .append("g").attr("transform", `translate(0, ${heightGraph-margin.bottom})`)
+    .call(d3.axisBottom(xScale).tickFormat(i => perRegion[i].name))
+    .attr("font-size", "18px");
+
+  svgGraph2
+    .append("g")
+    .attr("transform", `translate(${margin.left}, 0)`)
+    .call(d3.axisLeft(yScale).ticks(null, perRegion.infected))
+    .attr("font-size", "18px")
+  
+    //naslov
+  svgGraph2
+    .append("text")
+    .attr("x", (widthGraph/2))
+    .attr("y", 10)
+    .attr("text-anchor", "middle")
+    .style("font-size", "25px") 
+    .text("Skupno število okužb po regijah")
+    .style("font-weigh", "bold")
+    .attr("dy", "1em")
+    .style("fill", "black");
+
+//label x
+  svgGraph2.append("text")             
+    .attr("x", (widthGraph/2))
+    .attr("y", heightGraph-10)
+    .style("text-anchor", "middle")
+    .style("fill", "Black")
+    .style("font-style", "italic")
+    .text("Regija");
+//label y
+  svgGraph2.append("text")
+    //.attr("transform", "rotate(-90)")
+    .attr("x", 10)
+    .attr("y", 10)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .style("font-style", "italic")
+    .text("Število okužb")
+    .style("fill", "Black"); 
+  
 };
 
 

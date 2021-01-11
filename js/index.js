@@ -21,7 +21,7 @@ let podatkiObcinZaEnMesec;
 
 // --------------------------------------------------------------------------
 
-//prikazi današnje statse
+//Prikazi statsov
 const DisplayCurrent = async() => {
   stats= await getData(`https://api.sledilnik.org/api/Stats?from=${today}&to=${today}`);
   summary = await getData(`https://api.sledilnik.org/api/summary?toDate=${today}`);
@@ -83,6 +83,43 @@ const obcineFromTo = async (obcina) => {
   })
   update(globalGeoJson);
 };
+
+//========================================================================================================================
+
+var leg = d3.select("#legend")
+var keys = ["<50", "50-100", "100-200", "200-500", "Več kot 500"]
+
+var color = d3.scaleOrdinal()
+  .domain(keys)
+  .range(["rgb(224, 236, 248)","rgb(184, 213, 234)","rgb(100, 169, 210)","rgb(30, 108, 177)","rgb(8, 48, 107)"]);
+
+// Add one dot in the legend for each name.
+var size = 18
+leg.selectAll("mydots")
+  .data(keys)
+  .enter()
+  .append("rect")
+    .attr("x", 10)
+    .attr("y", function(d,i){ return 10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("width", size)
+    .attr("height", size)
+    .style("fill", function(d){ return color(d)})   
+
+// Add one dot in the legend for each name.
+leg.selectAll("mylabels")
+  .data(keys)
+  .enter()
+  .append("text")
+    .attr("x", 10 + size*1.2)
+    .attr("y", function(d,i){ return 10 + i*(size+5) + (size/2)})
+    .style("fill", function(d){ return color(d)})
+    .text(function(d){ return d})
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle")
+    
+
+
+//----------------------------------------------------------------------------------
 
 // ko daš miško čez
 function handleMouseover(d,a) {

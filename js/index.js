@@ -1,7 +1,7 @@
 //spremenljivke
 // včerajšnji dan datum
 var today = new Date();
-var dd = String(today.getDate()-1).padStart(2, '0');
+var dd = String(today.getDate()-2).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = today.getFullYear();
 
@@ -29,7 +29,13 @@ var globalGeoJson;
 let podatkiObcinZaEnMesec;
 var clicked = [];
 
+
+
+
 document.getElementById("datum").innerHTML = todayF;
+document.getElementById("dateTo").valueAsDate = new Date(Date.now() - 864e5);
+document.getElementById("dateFrom").valueAsDate = new Date(Date.now() - 864e5);
+
 
 // --------------------------------------------------------------------------
 
@@ -96,7 +102,7 @@ const obcineFromTo = async (obcina) => {
           })
       })
   })
-  update(globalGeoJson);
+  update();
 };
 
 //========================================================================================================================
@@ -187,6 +193,15 @@ function onClick(e, d) {
 
 // glaven prikaz -------------------------------------------------------------------
 
+function update() {
+  d3.select('#zemljevid g.map').selectAll('path').attr('fill', function(d) {
+    let neki = d.properties.name.replace(/\s+/g, '_').toLowerCase()
+    let obci = obcine.get(neki)
+    return d3.interpolateBlues(parseInt(obci)/250);
+  });
+}
+
+
 var projection = d3.geoMercator()
 .scale(16000)
 .translate([200, 280])
@@ -195,8 +210,8 @@ var projection = d3.geoMercator()
 var geoGenerator = d3.geoPath()
 .projection(projection);
 
-// update live 
-function update(geojson) {
+// initial display 
+function init(geojson) {
 var u = d3.select('#zemljevid g.map')
   .selectAll('path')
   .data(geojson.features)
@@ -209,7 +224,6 @@ u.enter()
     .attr("fill", function(d){
       let neki = d.properties.name.replace(/\s+/g, '_').toLowerCase()
       let obci = obcine.get(neki)
-      //console.log(neki, obci)
       return d3.interpolateBlues(parseInt(obci)/250)})
   .on('mouseover', handleMouseover)
   .on('mouseout', handleMouseout)
@@ -222,6 +236,7 @@ d3.json("data/svn_regional.geojson")
   .then(function(json){
     globalGeoJson = json;
     obcineFromTo("none");
+    init(globalGeoJson);
 });
 
 // funkcija za pridobivanje podatkov
@@ -237,6 +252,8 @@ return fetch(url)
     .catch(err => console.log(err));
 }
 
+
+//------------------------------------------------------------=======
 //izbira datuma
 $( function() {
 	$( "#datepicker" ).datepicker({
@@ -246,9 +263,6 @@ $( function() {
   
 });
 
-
-//------------------------------------------------------------
-
 let datum = document.getElementById("dateFrom");
 let datumDo = document.getElementById("dateTo");
 
@@ -257,8 +271,7 @@ datum.addEventListener('change' , async(event) =>{
   to = document.getElementById("dateTo").value || today;
   getBetweenDates(from, to);
   obcineFromTo("none");
-  update(globalGeoJson);
-  render();  
+  update();  
 });
 
 datumDo.addEventListener('change' , async(event) =>{  
@@ -266,8 +279,7 @@ datumDo.addEventListener('change' , async(event) =>{
   to = document.getElementById("dateTo").value || today;
   getBetweenDates(from, to);
   obcineFromTo("none");
-  update(globalGeoJson);
-  render();  
+  update();
 });
 
 
@@ -675,6 +687,3 @@ const svgGraph3 = d3.select("#graphContainer3")
     .text("Število pozitivnih testov")
     .style("fill", "Black"); 
 };
-
-
-

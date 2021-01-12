@@ -156,10 +156,10 @@ const chartOptions = {
           labels: [2, 5, 1, 3, 2, 6, 7],
           datasets: [
               {
-                  backgroundColor: "rgba(255, 0, 0, 0.2)",
-                  borderColor: "rgba(255, 0, 0, 0.02)",
+                  backgroundColor: "rgba(255, 0, 0, 0.05)",
+                  borderColor: "rgba(255, 0, 0, 0.8)",
                   borderWidth: 2,
-                  data: [10, 10, 10, 10, 10, 10, 10],
+                  data: [3, 3, 3, 3, 3, 3, 3],
               },
           ],
       },

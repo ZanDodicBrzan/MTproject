@@ -33,6 +33,7 @@ var clicked = [];
 
 
 document.getElementById("datum").innerHTML = todayF;
+document.getElementById("datum2").innerHTML = todayF;
 document.getElementById("dateTo").valueAsDate = new Date(Date.now() - 864e5);
 document.getElementById("dateFrom").valueAsDate = new Date(Date.now() - 864e5);
 

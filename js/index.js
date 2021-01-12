@@ -33,7 +33,7 @@ var clicked = [];
 
 
 document.getElementById("datum").innerHTML = todayF;
-//document.getElementById("dateTo").valueAsDate = new Date(Date.now() - 864e5);
+document.getElementById("dateTo").valueAsDate = new Date(Date.now() - 864e5);
 document.getElementById("dateFrom").valueAsDate = new Date(Date.now() - 864e5);
 
 
@@ -264,17 +264,16 @@ $( function() {
 });
 
 let datum = document.getElementById("dateFrom");
-//let datumDo = document.getElementById("dateTo");
+let datumDo = document.getElementById("dateTo");
 
 datum.addEventListener('change' , async(event) =>{  
   from = document.getElementById("dateFrom").value || today;
-  //to = document.getElementById("dateTo").value || today;
+  to = document.getElementById("dateTo").value || today;
   getBetweenDates(from, from);
   obcineFromTo("none");
   update();  
 });
 
-/*
 datumDo.addEventListener('change' , async(event) =>{  
   from = document.getElementById("dateFrom").value || today;
   to = document.getElementById("dateTo").value || today;
@@ -282,7 +281,6 @@ datumDo.addEventListener('change' , async(event) =>{
   obcineFromTo("none");
   update();
 });
-*/
 
 // =============================================================================
 
